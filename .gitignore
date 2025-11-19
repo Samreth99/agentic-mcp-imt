@@ -13,7 +13,7 @@ logs/
 
 agentic_mcp.egg-info
 
-/data
-/chroma_db
-/cache
+data/
+chroma_db/
+cache/
 *.ipynb
