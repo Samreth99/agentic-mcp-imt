@@ -13,7 +13,7 @@ from mcp_server.utils.logger import get_logger
 from mcp_server.config.constants import DATA_PATH, CACHE_PATH
 
 logger = get_logger(__name__)
-
+SourceType = Literal["file", "directory", "url"]
 
 class PDFLoader:
     """
@@ -137,7 +137,7 @@ class PDFLoader:
             loader = DirectoryLoader(
                 str(data_path),
                 glob="*.pdf",
-                loader_cls=PyMuPDFLoader,
+                loader_cls=PyMuPDFLoader, # type: ignore[arg-type]
                 show_progress=True
             )
             
@@ -247,8 +247,8 @@ class PDFLoader:
             "total_size_mb": round(total_size / (1024 * 1024), 2)
         }
     
-    
-    def _detect_source_type(self, source: str) -> str:
+        
+    def _detect_source_type(self, source: str) -> SourceType:
         """Auto-detect the source type."""
         if source.startswith(('http://', 'https://')):
             return "url"
@@ -260,6 +260,7 @@ class PDFLoader:
             return "file"
         else:
             raise ValueError(f"Cannot determine source type for: {source}")
+        
     
     def _get_cached_file_path(self, url: str) -> Path:
         """Generate cache file path from URL."""

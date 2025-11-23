@@ -15,6 +15,9 @@ OLLAMA_BASE_URL = "http://localhost:11434"
 CHUNK_SIZE = 1000
 CHUNK_OVERLAP = 200
 
+# Retriver Setting
+TOP_K = 5
+
 # Other paths
 DATA_PATH=os.path.join(current_dir, "../server/tools/rag/data")
 CACHE_PATH=os.path.join(current_dir, "../server/tools/rag/cache")

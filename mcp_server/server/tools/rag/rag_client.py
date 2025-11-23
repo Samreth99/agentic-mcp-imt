@@ -15,7 +15,10 @@ async def main():
             sid = get_session_id()
             print("Session ID after initialize:", sid)
 
-            result = await session.call_tool("delete_vector_store", {"confirm": True})
+            # result = await session.call_tool("delete_vector_store", {"confirm": True})
+            # result = await session.call_tool("ingest_documents", {"source": "D:\\IMT\\Lesson\\S9\\(2IA-IASD 9.6) - Deep Learning\\agentic_mcp\\mcp_server\\server\\tools\\rag\\data"})
+            # result = await session.call_tool("get_vector_store_info", {})
+            result = await session.call_tool("retrieve_documents", {"query": "Who is the responsable of this Module Mathematic for Machine Learning?"})
             print("Server result:", result)
 
 

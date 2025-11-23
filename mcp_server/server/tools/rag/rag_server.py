@@ -1,75 +1,15 @@
+import chromadb
+
 from mcp.server.fastmcp import FastMCP
 from typing import List, Optional, Literal
 from pathlib import Path
-import shutil
-
 from mcp_server.server.tools.rag.ingestion.pdf_loader import PDFLoader
 from mcp_server.server.tools.rag.ingestion.chunking import chunk_documents
 from mcp_server.server.tools.rag.ingestion.vector_store import get_or_create_vector_store
 from mcp_server.utils.logger import get_logger
-from mcp_server.config.constants import VECTOR_DB_PATH, CHROMA_COLLECTION_NAME, CHUNK_SIZE, CHUNK_OVERLAP,TOP_K
+from mcp_server.config.constants import VECTOR_DB_PATH, CHROMA_COLLECTION_NAME, CHUNK_SIZE, CHUNK_OVERLAP, TOP_K
 
 logger = get_logger(__name__)
-
-_vector_store_instance = None
-
-
-
-# Class to manage the lifecycle of the Chroma vector store
-
-class RAGVectorStore:
-
-    def __init__(self):
-
-        self._vector_store = None
-
-
-
-    async def lazy_init(self):
-
-        # This method is called by FastMCP during initialization.
-
-        # We log its call but don't eagerly load the vector store here.
-
-        logger.info("RAGVectorStore lazy_init called by FastMCP.")
-
-
-
-    def get_vector_store(self, text_chunks=None, update_mode="skip"):
-
-        # If not initialized or if text_chunks are provided (indicating an ingestion/update)
-
-        if self._vector_store is None or text_chunks is not None:
-
-            logger.info("Initializing or updating Chroma vector store on demand.")
-
-            self._vector_store = get_or_create_vector_store(text_chunks=text_chunks, update_mode=update_mode)
-
-        return self._vector_store
-
-
-
-    def shutdown(self):
-
-        if self._vector_store is not None:
-
-            logger.info("Shutting down Chroma vector store instance.")
-
-            # The persist is handled by get_or_create_vector_store,
-
-            # but setting to None will release the in-memory object.
-
-            self._vector_store = None
-
-
-
-# Global instance of the RAGVectorStore manager
-
-rag_vector_store_manager = RAGVectorStore()
-
-
-
-
 
 mcp = FastMCP("RAG MCP")
 
@@ -96,7 +36,6 @@ def ingest_documents(
     
     Returns:
         Dictionary with ingestion statistics including number of documents processed
-    
     """
     try:
         logger.info(f"Starting document ingestion from: {source}")
@@ -121,7 +60,7 @@ def ingest_documents(
         
         logger.info(f"Created {len(text_chunks)} text chunks")
         
-        vector_store = rag_vector_store_manager.get_vector_store(
+        vector_store = get_or_create_vector_store(
             text_chunks=text_chunks,
             update_mode=update_mode
         )
@@ -152,7 +91,7 @@ def ingest_documents(
 @mcp.tool()
 def retrieve_documents(
     query: str,
-    top_k: int = TOP_K,
+    top_k: int = TOP_K
 ) -> dict:
     """
     Retrieve relevant documents from the vector store based on a query.
@@ -163,7 +102,6 @@ def retrieve_documents(
     
     Returns:
         Dictionary containing relevant documents with their content, metadata, and scores
-    
     """
     try:
         if not query or not query.strip():
@@ -175,8 +113,8 @@ def retrieve_documents(
         logger.info(f"Retrieving documents for query: {query}")
         
         # Load vector store
-        vector_store = rag_vector_store_manager.get_vector_store()
-
+        vector_store = get_or_create_vector_store()
+        
         results = vector_store.similarity_search_with_score(
             query=query,
             k=top_k
@@ -241,7 +179,7 @@ def get_vector_store_info() -> dict:
         if exists:
             try:
                 # Load vector store to get stats
-                vector_store = rag_vector_store_manager.get_vector_store()
+                vector_store = get_or_create_vector_store()
                 collection = vector_store._collection
                 
                 doc_count = collection.count()
@@ -251,7 +189,6 @@ def get_vector_store_info() -> dict:
                     "status": "active"
                 })
                 
-                # Get sample metadata if documents exist
                 if doc_count > 0:
                     sample_docs = collection.get(limit=1, include=["metadatas"])
                     if sample_docs:
@@ -286,17 +223,17 @@ def get_vector_store_info() -> dict:
 
 
 @mcp.tool()
-def delete_vector_store(
+def clear_vector_store(
     confirm: bool = False
 ) -> dict:
     """
-    Delete the vector store.
+    Clear the vector store by removing the collection via ChromaDB API.
     
     WARNING: This operation is irreversible and will delete all stored documents.
     
     Args:
         confirm: Must be set to True to confirm deletion (safety measure)
-
+    
     Returns:
         Dictionary with deletion status and details
     """
@@ -308,35 +245,55 @@ def delete_vector_store(
                 "warning": "This operation will permanently delete all documents in the vector store."
             }
         
-        logger.warning("Attempting to delete vector store. The server must be stopped first to release file locks.")
+        logger.warning("Clearning vector store - this operation is irreversible")
         
         db_path = Path(VECTOR_DB_PATH)
+        deleted_items = []
         
         if db_path.exists():
-            return {
-                "success": False,
-                "error": "Failed to delete vector store: Files are likely in use.",
-                "message": (
-                    f"To delete the vector store at '{VECTOR_DB_PATH}', "
-                    "please stop the FastMCP server process manually, "
-                    "then delete the directory, and finally restart the server."
-                )
-            }
+            try:
+                # Use ChromaDB API to delete the collection 
+                client = chromadb.PersistentClient(path=str(db_path))
+                
+                try:
+                    collection = client.get_collection(CHROMA_COLLECTION_NAME)
+                    doc_count = collection.count()
+                    deleted_items.append(f"vector_store ({doc_count} documents)")
+                except Exception:
+                    doc_count = 0
+                    deleted_items.append("vector_store")
+                
+                client.delete_collection(CHROMA_COLLECTION_NAME)
+                logger.info(f"Deleted collection '{CHROMA_COLLECTION_NAME}'")     
+                # Clean up client reference
+                del client
+                
+                return {
+                    "success": True,
+                    "deleted": deleted_items,
+                    "message": f"Successfully deleted vector store with {doc_count} documents"
+                }
+                
+            except Exception as e:
+                logger.error(f"Failed to delete vector store: {e}")
+                return {
+                    "success": False,
+                    "error": f"Failed to delete vector store: {str(e)}"
+                }
         else:
-            logger.info("Vector store directory does not exist, nothing to delete.")
+            logger.info("Vector store does not exist, nothing to delete")
             return {
                 "success": True,
                 "deleted": [],
-                "message": "Vector store directory does not exist, no action needed."
+                "message": "Vector store does not exist"
             }
         
     except Exception as e:
-        logger.exception("Failed to process delete vector store request.")
+        logger.exception("Failed to delete vector store")
         return {
             "success": False,
             "error": str(e)
         }
-
 
 
 if __name__ == "__main__":
