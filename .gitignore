@@ -14,6 +14,6 @@ logs/
 agentic_mcp.egg-info
 
 data/
-chroma_db/
+vector_db/
 cache/
 *.ipynb

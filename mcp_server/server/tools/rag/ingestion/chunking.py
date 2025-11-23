@@ -50,6 +50,10 @@ def chunk_documents(
         
         text_chunks = text_splitter.split_documents(documents)
         
+        # Add chunk index to metadata for unique ID generation
+        for i, chunk in enumerate(text_chunks):
+            chunk.metadata["chunk_index"] = i
+            
         logger.info(f"Successfully generated {len(text_chunks)} text chunks from {len(documents)} documents")
         return text_chunks
         

@@ -98,6 +98,9 @@ class PDFLoader:
         try:
             loader = PyMuPDFLoader(str(path))
             documents = loader.load()
+
+            # Sort pages to ensure consistent order
+            documents.sort(key=lambda doc: doc.metadata.get('page', 0))
             
             logger.info(f"Successfully loaded {len(documents)} pages from {path.name}")
             return documents
@@ -145,7 +148,10 @@ class PDFLoader:
                 logger.warning(warning_msg)
                 raise ValueError(warning_msg)
             
-            logger.info(f"Successfully loaded {len(documents)} documents from {data_path}")
+            # Sort documents by source and page to ensure consistent order
+            documents.sort(key=lambda doc: (doc.metadata.get('source', ''), doc.metadata.get('page', 0)))
+            
+            logger.info(f"Successfully loaded and sorted {len(documents)} documents from {data_path}")
             return documents
             
         except Exception as e:
