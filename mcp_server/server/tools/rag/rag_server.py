@@ -1,6 +1,6 @@
 import chromadb
 
-from mcp.server.fastmcp import FastMCP
+from fastmcp import FastMCP
 from typing import List, Optional, Literal
 from pathlib import Path
 from mcp_server.server.tools.rag.ingestion.pdf_loader import PDFLoader
@@ -11,8 +11,9 @@ from mcp_server.config.constants import VECTOR_DB_PATH, CHROMA_COLLECTION_NAME, 
 
 logger = get_logger(__name__)
 
-mcp = FastMCP("RAG MCP")
-
+mcp = FastMCP(
+    "RAG MCP",
+    stateless_http=True)
 
 @mcp.tool()
 def ingest_documents(
@@ -297,4 +298,4 @@ def clear_vector_store(
 
 
 if __name__ == "__main__":
-    mcp.run(transport="streamable-http")
+    mcp.run(transport="streamable-http", host="0.0.0.0", port=3000)
