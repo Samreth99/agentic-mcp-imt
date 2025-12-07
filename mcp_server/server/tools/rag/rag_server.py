@@ -153,17 +153,14 @@ def retrieve_documents(
 
 
 @mcp.tool()
-def get_vector_store_info() -> dict:
+def get_vector_store_info(
+    query: Optional[str] = None
+) -> dict:
     """
     Get detailed information about the vector store including statistics and configuration.
-    
-    Returns:
-        Dictionary with vector store information including:
-        - Document count
-        - Collection name
-        - Storage path
-        - Cache information
-        - Embedding model details
+
+    The 'query' parameter is optional and ignored. It exists so that
+    LLMs can safely call this tool even if they pass query="...".
     """
     try:
         logger.info("Retrieving vector store information")
@@ -221,6 +218,7 @@ def get_vector_store_info() -> dict:
             "success": False,
             "error": str(e)
         }
+
 
 
 @mcp.tool()

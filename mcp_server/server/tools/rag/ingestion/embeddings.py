@@ -16,7 +16,7 @@ def get_embedding_model():
     try:
         logger.info("Initializing embedding model for the first time...")
         _embedding_model = HuggingFaceEmbeddings(
-            model_name="BAAI/bge-m3",
+            model_name=EMBED_MODEL,
         )
         logger.info("Embedding model loaded successfully.")
         return _embedding_model

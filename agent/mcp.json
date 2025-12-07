@@ -3,4 +3,9 @@
                 "url": "http://127.0.0.1:3000/mcp/",
                 "transport": "streamable_http"
             },
+
+            "tavily-remote-mcp": {
+            "command": "npx -y mcp-remote https://mcp.tavily.com/mcp/?tavilyApiKey=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",
+            "env": {}
+            }
         }

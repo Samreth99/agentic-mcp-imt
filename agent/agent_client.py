@@ -22,13 +22,19 @@ class Agent_Client:
     async def initialize(self) -> None:
         try:
             self.client = MultiServerMCPClient(
-                {
+               {
                     "rag_server": {
-                        "url": "http://rag_server:3000/mcp/",
+                        "url": "http://localhost:3000/mcp",
                         "transport": "streamable_http"
                     },
-                }
-            )
+                    
+                    "tavily-remote": {
+                        "url": "https://mcp.tavily.com/mcp/?tavilyApiKey=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",
+                        "transport": "streamable_http",
+                     }
+                    }
+                )
+            
             tools = await self.client.get_tools()
             self.agent = build_graph(tools, 
                                     self.system_prompt, 

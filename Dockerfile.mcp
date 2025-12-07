@@ -11,13 +11,10 @@ RUN pip install --no-cache-dir \
     langchain-chroma \
     langchain-community \
     langchain-mcp-adapters \
-    langchain-ollama \
     langchain-text-splitters \
     mcp-use[search] \
     mcp[cli] \
-    pdfplumber \
     pymupdf \ 
-    pypdf2 \
     python-dotenv \
     requests \
     langchain-huggingface \
