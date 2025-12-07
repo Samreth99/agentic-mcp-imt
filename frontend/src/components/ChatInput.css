@@ -1,0 +1,354 @@
+.chat-input-form {
+  padding: 1.25rem 1.75rem 1.5rem;
+  background: var(--surface-primary);
+  border-top: 1px solid var(--border-default);
+  position: relative;
+  z-index: 10;
+}
+
+/* Gradient fade at top */
+.chat-input-form::before {
+  content: '';
+  position: absolute;
+  top: -30px;
+  left: 0;
+  right: 0;
+  height: 30px;
+  background: linear-gradient(to top, var(--surface-primary) 0%, transparent 100%);
+  pointer-events: none;
+}
+
+.chat-input-container {
+  display: flex;
+  align-items: flex-end;
+  gap: 0.875rem;
+  max-width: 100%;
+  position: relative;
+}
+
+/* ============================================
+   Input Field - Premium Style
+   ============================================ */
+.chat-input {
+  flex: 1;
+  padding: 1rem 1.5rem;
+  border: 2px solid var(--border-default);
+  border-radius: var(--radius-3xl);
+  font-size: 0.9375rem;
+  font-family: inherit;
+  font-weight: 400;
+  resize: none;
+  outline: none;
+  transition: all var(--transition-base);
+  min-height: 52px;
+  max-height: 160px;
+  line-height: 1.5;
+  background: var(--surface-secondary);
+  color: var(--text-primary);
+  box-shadow: var(--shadow-inner);
+}
+
+.chat-input::placeholder {
+  color: var(--text-muted);
+  font-weight: 400;
+}
+
+.chat-input:hover {
+  border-color: var(--border-hover);
+  background: var(--surface-primary);
+}
+
+.chat-input:focus {
+  border-color: var(--primary-500);
+  background: var(--surface-primary);
+  box-shadow: 
+    var(--shadow-inner),
+    0 0 0 4px rgba(37, 99, 235, 0.1),
+    0 0 20px rgba(37, 99, 235, 0.05);
+}
+
+.chat-input:disabled {
+  background: var(--surface-tertiary);
+  border-color: var(--border-default);
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+/* ============================================
+   Send Button - Floating Action Style
+   ============================================ */
+.send-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 52px;
+  height: 52px;
+  padding: 0;
+  border: none;
+  border-radius: 50%;
+  background: var(--gradient-primary);
+  color: white;
+  cursor: pointer;
+  transition: all var(--transition-base);
+  flex-shrink: 0;
+  box-shadow: 
+    var(--shadow-md),
+    0 4px 15px rgba(37, 99, 235, 0.35);
+  position: relative;
+  overflow: hidden;
+}
+
+/* Shine effect */
+.send-button::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.3),
+    transparent
+  );
+  transition: left 0.5s ease;
+}
+
+/* Ripple effect container */
+.send-button::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at center, rgba(255, 255, 255, 0.3) 0%, transparent 70%);
+  opacity: 0;
+  transition: opacity var(--transition-fast);
+}
+
+.send-button:hover:not(:disabled) {
+  transform: scale(1.08) translateY(-2px);
+  box-shadow: 
+    var(--shadow-lg),
+    0 8px 25px rgba(37, 99, 235, 0.4);
+}
+
+.send-button:hover:not(:disabled)::before {
+  left: 100%;
+}
+
+.send-button:active:not(:disabled) {
+  transform: scale(1) translateY(0);
+  box-shadow: 
+    var(--shadow-sm),
+    0 2px 10px rgba(37, 99, 235, 0.3);
+}
+
+.send-button:active:not(:disabled)::after {
+  opacity: 1;
+}
+
+.send-button:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  box-shadow: none;
+  transform: none;
+}
+
+.send-button svg {
+  width: 22px;
+  height: 22px;
+  margin-left: 2px;
+  transition: transform var(--transition-base);
+  position: relative;
+  z-index: 1;
+}
+
+.send-button:hover:not(:disabled) svg {
+  transform: translateX(2px);
+}
+
+/* ============================================
+   Typing Indicator - Premium Animation
+   ============================================ */
+.typing-indicator {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 0.75rem 0 0.25rem;
+}
+
+.typing-indicator span {
+  width: 10px;
+  height: 10px;
+  background: linear-gradient(135deg, var(--primary-500), var(--primary-600));
+  border-radius: 50%;
+  animation: typing-wave 1.4s ease-in-out infinite;
+  box-shadow: 0 2px 8px rgba(37, 99, 235, 0.3);
+}
+
+.typing-indicator span:nth-child(1) {
+  animation-delay: 0s;
+}
+
+.typing-indicator span:nth-child(2) {
+  animation-delay: 0.15s;
+}
+
+.typing-indicator span:nth-child(3) {
+  animation-delay: 0.3s;
+}
+
+@keyframes typing-wave {
+  0%, 60%, 100% {
+    transform: translateY(0) scale(1);
+    opacity: 0.5;
+  }
+  30% {
+    transform: translateY(-8px) scale(1.1);
+    opacity: 1;
+  }
+}
+
+/* Alternative bounce style */
+.typing-indicator.bounce span {
+  animation: typing-bounce 1.4s ease-in-out infinite;
+}
+
+@keyframes typing-bounce {
+  0%, 80%, 100% {
+    transform: scale(0.7);
+    opacity: 0.4;
+  }
+  40% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+/* ============================================
+   Dark Mode
+   ============================================ */
+@media (prefers-color-scheme: dark) {
+  .chat-input-form {
+    background: var(--slate-900);
+    border-top-color: var(--slate-700);
+  }
+
+  .chat-input-form::before {
+    background: linear-gradient(to top, var(--slate-900) 0%, transparent 100%);
+  }
+
+  .chat-input {
+    background: var(--slate-800);
+    border-color: var(--slate-700);
+    color: var(--slate-100);
+    box-shadow: var(--shadow-inner);
+  }
+
+  .chat-input::placeholder {
+    color: var(--slate-500);
+  }
+
+  .chat-input:hover {
+    border-color: var(--slate-600);
+    background: var(--slate-800);
+  }
+
+  .chat-input:focus {
+    border-color: var(--primary-500);
+    background: var(--slate-800);
+    box-shadow: 
+      var(--shadow-inner),
+      0 0 0 4px rgba(59, 130, 246, 0.15),
+      0 0 25px rgba(59, 130, 246, 0.1);
+  }
+
+  .chat-input:disabled {
+    background: var(--slate-800);
+    border-color: var(--slate-700);
+  }
+
+  .send-button {
+    background: linear-gradient(135deg, var(--primary-500) 0%, var(--primary-600) 100%);
+    box-shadow: 
+      var(--shadow-md),
+      0 4px 20px rgba(59, 130, 246, 0.4);
+  }
+
+  .send-button:hover:not(:disabled) {
+    box-shadow: 
+      var(--shadow-lg),
+      0 8px 30px rgba(59, 130, 246, 0.5);
+  }
+
+  .typing-indicator span {
+    background: linear-gradient(135deg, var(--primary-400), var(--primary-500));
+    box-shadow: 0 2px 10px rgba(59, 130, 246, 0.4);
+  }
+}
+
+/* ============================================
+   Responsive Design
+   ============================================ */
+@media (max-width: 768px) {
+  .chat-input-form {
+    padding: 1rem 1.25rem 1.25rem;
+  }
+
+  .chat-input-container {
+    gap: 0.75rem;
+  }
+
+  .chat-input {
+    padding: 0.875rem 1.25rem;
+    font-size: 1rem;
+    min-height: 48px;
+    border-radius: var(--radius-2xl);
+  }
+
+  .send-button {
+    width: 48px;
+    height: 48px;
+  }
+
+  .send-button svg {
+    width: 20px;
+    height: 20px;
+  }
+
+  .typing-indicator span {
+    width: 8px;
+    height: 8px;
+  }
+}
+
+/* ============================================
+   Keyboard Focus Enhancement
+   ============================================ */
+.chat-input:focus-visible {
+  outline: none;
+}
+
+.send-button:focus-visible {
+  outline: 3px solid var(--primary-300);
+  outline-offset: 3px;
+}
+
+/* ============================================
+   Loading State Enhancement
+   ============================================ */
+.chat-input-form.loading .send-button {
+  animation: pulse-soft 1.5s ease-in-out infinite;
+}
+
+.chat-input-form.loading .chat-input {
+  background-image: linear-gradient(
+    90deg,
+    var(--surface-secondary) 0%,
+    var(--surface-tertiary) 50%,
+    var(--surface-secondary) 100%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+}
