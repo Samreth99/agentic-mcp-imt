@@ -5,7 +5,8 @@ from mcp.client.streamable_http import streamablehttp_client
 
 
 async def main():
-    url = "http://127.0.0.1:3000/mcp/"
+    # url = "http://localhost:5000/mcp"
+    url = "http://localhost:3000/mcp"
     async with streamablehttp_client(url) as (read, write, get_session_id):
         async with ClientSession(read, write) as session:
             print("Before initialize:", get_session_id())

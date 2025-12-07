@@ -1,0 +1,28 @@
+FROM python:3.11-slim
+
+WORKDIR /app
+
+COPY mcp_server ./mcp_server
+
+RUN pip install --no-cache-dir \
+    fastmcp \
+    chromadb \
+    langchain \
+    langchain-chroma \
+    langchain-community \
+    langchain-mcp-adapters \
+    langchain-ollama \
+    langchain-text-splitters \
+    mcp-use[search] \
+    mcp[cli] \
+    pdfplumber \
+    pymupdf \ 
+    pypdf2 \
+    python-dotenv \
+    requests \
+    langchain-huggingface \
+    sentence-transformers
+
+EXPOSE 3000
+
+CMD ["python", "-m", "mcp_server.server.tools.rag.rag_server"]

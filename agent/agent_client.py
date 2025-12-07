@@ -1,14 +1,14 @@
 
 import traceback
-from typing import Any
-from graph.graph_builder import build_graph
+from typing import Any, Optional
+from agent.graph.graph_builder import build_graph
 from langchain_mcp_adapters.client import MultiServerMCPClient
 from langchain_core.messages import AIMessage
 from agent.graph.state.state import State
 from langchain_core.messages import AnyMessage
 from agent.config.prompts import AGENT_SYSTEM_PROMPT
 from agent.config.constants import MODEL_NAME, TEMPERATURE
-from agent.config.constants import config
+from langchain_core.runnables import RunnableConfig
 
 class Agent_Client:
     def __init__(self) -> None:
@@ -24,7 +24,7 @@ class Agent_Client:
             self.client = MultiServerMCPClient(
                 {
                     "rag_server": {
-                        "url": "http://127.0.0.1:3000/mcp/",
+                        "url": "http://rag_server:3000/mcp/",
                         "transport": "streamable_http"
                     },
                 }
@@ -39,13 +39,16 @@ class Agent_Client:
             traceback.print_exc()
             raise
 
-    async def ask(self, messages: list[AnyMessage]) -> str:
+    async def ask(self, messages: list[AnyMessage], thread_id: Optional[str] = None) -> str:
         try:
             if not self.is_initialized:
                 await self.initialize()
 
             state: State = {"messages": messages}
+
+            config: RunnableConfig = {"configurable": {"thread_id": thread_id}}
             result = await self.agent.ainvoke(state, config=config)
+      
 
             for msg in reversed(result["messages"]):
                 if isinstance(msg, AIMessage):

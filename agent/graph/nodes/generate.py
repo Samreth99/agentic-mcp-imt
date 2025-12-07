@@ -1,7 +1,7 @@
 from agent.graph.state.state import State
 from langchain_groq import ChatGroq
 from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
-
+from agent.config.setting import settings
 
 class Generator_Agent:
     

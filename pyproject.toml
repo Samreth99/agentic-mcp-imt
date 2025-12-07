@@ -17,6 +17,7 @@ dependencies = [
     "langchain-chroma>=0.2.6",
     "langchain-community>=0.3.29",
     "langchain-groq>=1.1.0",
+    "langchain-huggingface>=1.1.0",
     "langchain-mcp-adapters>=0.1.9",
     "langchain-ollama>=0.3.8",
     "langchain-openai>=0.3.33",
@@ -33,4 +34,5 @@ dependencies = [
     "pypdf2>=3.0.1",
     "python-dotenv>=1.1.1",
     "requests>=2.32.5",
+    "sentence-transformers>=5.1.2",
 ]

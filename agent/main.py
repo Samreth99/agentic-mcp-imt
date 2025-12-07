@@ -1,43 +1,83 @@
-import os
-import json
-import asyncio
+import uvicorn
+from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
+from contextlib import asynccontextmanager
 
-from langchain.agents import create_agent
-from langchain_mcp_adapters.client import MultiServerMCPClient
-from agent.config.setting import settings
-from agent.config.constants import config
-from langchain_groq import ChatGroq
-from langgraph.checkpoint.memory import MemorySaver
+from agent.api.routes import chat, health
+from agent.api.services.agent_service import get_agent_service
+from agent.utils.logger import get_logger
 
-# current_dir = os.path.dirname(os.path.abspath(__file__))
-# mcp_config_path = os.path.join(current_dir, "mcp.json")
-# mcp_json = json.load(open(mcp_config_path, 'r'))
+logger = get_logger(__name__)
 
-# memory = MemorySaver()
 
-async def main():
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    """
+    Application lifespan handler for startup and shutdown events.
+    """
+    logger.info("Starting up AGENTIC_MCP API...")
+    service = get_agent_service()
+    try:
+        await service.initialize_agent()
+        logger.info("Agent initialized successfully on startup")
+    except Exception as e:
+        logger.warning(f"Agent initialization deferred: {e}")
+    
+    yield
+    
+    logger.info("Shutting down AGENTIC_MCP API...")
+    await service.shutdown()
+    logger.info("Shutdown complete")
 
-    client = MultiServerMCPClient(
-        {
-            "rag_server": {
-                "url": "http://127.0.0.1:3000/mcp/",
-                "transport": "streamable_http"
-            },
-        }
+
+def create_app() -> FastAPI:
+    """
+    Factory function to create and configure the FastAPI application.
+    """
+    app = FastAPI(
+        title="AGENTIC_MCP API",
+        description="AI Assistant API for IMT Mines Alès using LangGraph and MCP",
+        version="1.0.0",
+        docs_url="/docs",
+        redoc_url="/redoc",
+        openapi_url="/openapi.json",
+        lifespan=lifespan
     )
-
-    # model = ChatOllama(base_url="http://localhost:11434", model="qwen3:4b")
-    model = ChatGroq(model = "openai/gpt-oss-20b")
-
-    tools = await client.get_tools()
-
-    agent = create_agent(model, tools)
+    
+    # CORS middleware
+    app.add_middleware(
+        CORSMiddleware,
+        allow_origins=["http://localhost:5173"], 
+        allow_credentials=True,
+        allow_methods=["*"],
+        allow_headers=["*"],
+    )
+    
+    # Include routers
+    app.include_router(health.router)
+    app.include_router(chat.router)
 
     
-    agent_response = await agent.ainvoke({"messages": [{"role": "user", "content": "Who is responsible for Mathematic for Machine Learning Module? use rag tool"}]})
-    response = agent_response['messages'][-1].content
-    print(f"\nResponse: {response}")
+    @app.get("/", tags=["Root"])
+    async def root():
+        """Root endpoint with API information."""
+        return {
+            "name": "AGENTIC_MCP API",
+            "description": "AI Assistant for IMT Mines Alès",
+            "version": "1.0.0",
+            "docs": "/docs",
+            "health": "/health"
+        }
+    
+    return app
+
+
+app = create_app()
+
 
 if __name__ == "__main__":
-    asyncio.run(main())
-    # print(mcp_json)
+    uvicorn.run(
+        "agent.main:app",
+        host="0.0.0.0",
+        port=8000
+    )
