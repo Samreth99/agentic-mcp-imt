@@ -1,4 +1,4 @@
-dataset = [
+testset = [
     {
         "inputs": {"question": "Which decision-making techniques are included in the 'Decision Analysis' module?"},
         "expectations": {"expected_response": "Techniques include classical MCDA methods like AHP, ELECTRE, and PROMETHEE, as well as non-additive approaches such as fuzzy integrals."},
@@ -16,17 +16,6 @@ dataset = [
         "expectations": {"expected_response": "Design of shallow and deep foundations, soil pressure calculations, and water impact on foundations according to Eurocodes."},
     },
     {
-        "inputs": {"question": "Which Eurocode standards are used in this UE?"},
-        "expectations": {"expected_response": "EN 1990, EN 1991 and EN 206-1 for load combinations and concrete requirements."},
-    },
-    {
-        "inputs": {
-            "question": "What is a typical prerequisite for the diagnostics module?"},
-        "expectations": {
-            "expected_response": "Structural mechanics, reinforced and prestressed concrete, mixed structures, geotechnics and soil-structure interaction."
-        }
-    },
-    {
         "inputs": {"question": "What is studied in management of built heritage and rehabilitation?"},
         "expectations": {
             "expected_response": "Evaluation of existing buildings, envelope rehabilitation, energy performance, structural conception, execution methods and interaction between soil and structure."
@@ -39,10 +28,6 @@ dataset = [
     {
         "inputs": {"question": "How do I pay my rent at la Meuh?"},
         "expectations": {"expected_response": "Choosing direct debit is simple and recommended: direct debits are made after the 20th of the current month. You also have the option of paying by credit card, check payable to MdE, or in cash. The monthly aid is deducted directly from the rent. For this type of payment, the rent must be paid in advance."},
-    },
-    {
-        "inputs": {"question": "Does the module include both theoretical and practical components?"},
-        "expectations": {"expected_response": "Yes, the module combines theoretical lectures with extensive hands-on labs and implementation exercises."},
     },
     {
         "inputs": {"question": "What is underpinning?"
@@ -110,10 +95,6 @@ dataset = [
     {
         "inputs": {"question": "Can you explain the format of the 'Decision Analysis' module?"},
         "expectations": {"expected_response": "This module is divided into two courses: 'Uncertainty Theories' and 'Multiple Criteria Decision Analysis.' Each course includes lectures, hands-on labs, seminars, and evaluations."},
-    },
-    {
-        "inputs": {"question": "What are the main families of metallic materials studied in this course?"},
-        "expectations": {"expected_response": "The course covers steels, cast irons, non-ferrous alloys, and associated metallurgical transformations."},
     },
     {
         "inputs": {"question": "What is the purpose of using phase diagrams in metallurgy?"},

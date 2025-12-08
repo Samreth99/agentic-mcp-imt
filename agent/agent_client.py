@@ -28,10 +28,10 @@ class Agent_Client:
                         "transport": "streamable_http"
                     },
                     
-                    "tavily-remote": {
-                        "url": "https://mcp.tavily.com/mcp/?tavilyApiKey=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",
-                        "transport": "streamable_http",
-                     }
+                    # "tavily-remote": {
+                    #     "url": "https://mcp.tavily.com/mcp/?tavilyApiKey=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",
+                    #     "transport": "streamable_http",
+                    #  }
                     }
                 )
             

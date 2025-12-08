@@ -9,10 +9,9 @@ RUN pip install --no-cache-dir \
     "uvicorn[standard]" \
     langchain-mcp-adapters \
     langgraph \
-    mcp \
+    fastmcp \
     langchain-groq \
-    python-dotenv \
-    langchain_google_genai
+    python-dotenv 
 
 EXPOSE 8000
 

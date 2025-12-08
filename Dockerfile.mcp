@@ -12,8 +12,6 @@ RUN pip install --no-cache-dir \
     langchain-community \
     langchain-mcp-adapters \
     langchain-text-splitters \
-    mcp-use[search] \
-    mcp[cli] \
     pymupdf \ 
     python-dotenv \
     requests \
