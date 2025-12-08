@@ -2,7 +2,12 @@
 
 An AI-powered chatbot designed to assist international students at IMT Mines Alès with academic information, administrative procedures, and campus services. This project implements a state-of-the-art **Agentic Retrieval-Augmented Generation (RAG)** system using the **Model Context Protocol (MCP)** and **LangGraph**.
 
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Python](https://img.shields.io/badge/Python-3.11+-blue.svg)](https://www.python.org/downloads/)
+[![React](https://img.shields.io/badge/React-19.2.0-61DAFB.svg?logo=react)](https://react.dev/)
+[![FastMCP](https://img.shields.io/badge/FastMCP-2.12.3+-purple.svg)](https://github.com/jlowin/fastmcp)
+[![LangChain](https://img.shields.io/badge/LangChain-0.3.27+-orange.svg)](https://www.langchain.com/)
+[![LangGraph](https://img.shields.io/badge/LangGraph-0.6.7+-red.svg)](https://langchain-ai.github.io/langgraph/)
+[![License](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
 ---
 
