@@ -1,6 +1,6 @@
 # IMT Mines Alès Chatbot - Agentic RAG with MCP
 
-An AI-powered chatbot designed to assist international students at IMT Mines Alès with academic information, administrative procedures, and campus services. This project implements a state-of-the-art **Agentic Retrieval-Augmented Generation (RAG)** system using the **Model Context Protocol (MCP)** and **LangGraph**.
+An AI-powered chatbot designed to assist international students at IMT Mines Alès with academic information, administrative procedures, and campus services. This project implements the **Agentic Retrieval-Augmented Generation (RAG)** system using the **Model Context Protocol (MCP)** and **LangGraph**.
 
 [![Python](https://img.shields.io/badge/Python-3.11+-blue.svg)](https://www.python.org/downloads/)
 [![React](https://img.shields.io/badge/React-19.2.0-61DAFB.svg?logo=react)](https://react.dev/)
