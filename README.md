@@ -304,7 +304,7 @@ agentic-mcp-imt/
 ## 🎥 Demo Video
 
 ```markdown
-https://user-images.githubusercontent.com/YOUR_USER_ID/YOUR_VIDEO.mp4
+<!-- Uploading "Untitled video - Made with Clipchamp (4).mp4"... -->
 ```
 
 ---
