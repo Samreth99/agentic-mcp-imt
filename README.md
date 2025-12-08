@@ -407,13 +407,6 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ---
 
-## 📚 Resources
-
-### Documentation
-
-- [Full Project Report](https://drive.google.com/drive/folders/1hA5ApyjZxNfCZcgNRKgbOtMu3tBvdsmt) - Complete academic paper with methodology and results
-- [Dataset & PDFs](https://drive.google.com/drive/folders/1hA5ApyjZxNfCZcgNRKgbOtMu3tBvdsmt) - Training/evaluation data and source documents
-
 ### Related Technologies
 
 - [Model Context Protocol (MCP)](https://modelcontextprotocol.io/docs/getting-started/intro)
