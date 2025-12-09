@@ -268,12 +268,15 @@ You should see the chat interface ready to accept queries!
 
 ```
 agentic-mcp-imt/
-├── agent/                          # Backend agent implementation
+├── agent/                         # Backend agent implementation
 │   ├── main.py                    # FastAPI application entry point
 │   ├── agent_client.py            # Agent client for testing
 │   ├── api/                       # FastAPI routes and services
 │   ├── config/                    # Configuration files
 │   │   └── prompts.py             # System prompts and templates
+│   ├── evaluation/                # Evaluation
+│       └── data_set.py            # Testset
+│       └── llm_as_a_judge.py      # LLM-as-a-Judge Evalulation
 │   ├── graph/                     # LangGraph implementation
 │   │   └── graph_builder.py       # LangGraph ReAct agent logic
 │   ├── schemas/                   # Pydantic schemas
