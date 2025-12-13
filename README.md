@@ -417,6 +417,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 - [Model Context Protocol (MCP)](https://modelcontextprotocol.io/docs/getting-started/intro)
 - [LangGraph Documentation](https://docs.langchain.com/oss/python/langgraph/overview)
 - [Groq API](https://groq.com/)
+- [ReAct Paper](https://arxiv.org/abs/2210.03629)
 - [BGE-M3 Paper](https://arxiv.org/abs/2402.03216)
 
 ---
