@@ -11,6 +11,17 @@ An AI-powered chatbot designed to assist international students at IMT Mines Al�
 
 ---
 
+---
+
+## 🎥 Demo Video
+
+
+
+https://github.com/user-attachments/assets/5bc3b84b-d52a-4f63-94f9-d4db74552800
+
+
+---
+
 ## 📋 Table of Contents
 
 - [Overview](#overview)
@@ -20,7 +31,6 @@ An AI-powered chatbot designed to assist international students at IMT Mines Al�
 - [Installation](#installation)
 - [Running the Application](#running-the-application)
 - [Project Structure](#project-structure)
-- [Demo Video](#demo-video)
 - [Technologies Used](#technologies-used)
 - [Evaluation Results](#evaluation-results)
 - [Future Work](#future-work)
@@ -275,8 +285,8 @@ agentic-mcp-imt/
 │   ├── config/                    # Configuration files
 │   │   └── prompts.py             # System prompts and templates
 │   ├── evaluation/                # Evaluation
-│       └── data_set.py            # Testset
-│       └── llm_as_a_judge.py      # LLM-as-a-Judge Evalulation
+│   │   └── data_set.py            # Testset
+│   │   └── llm_as_a_judge.py      # LLM-as-a-Judge Evalulation
 │   ├── graph/                     # LangGraph implementation
 │   │   └── graph_builder.py       # LangGraph ReAct agent logic
 │   ├── schemas/                   # Pydantic schemas
@@ -307,15 +317,7 @@ agentic-mcp-imt/
 └── README.md                      # This file
 ```
 
----
 
-## 🎥 Demo Video
-
-
-https://github.com/user-attachments/assets/09321ca2-63df-4bd2-ac14-4744405a779b
-
-
----
 
 ## 🛠️ Technologies Used
 
