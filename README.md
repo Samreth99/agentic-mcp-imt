@@ -10,9 +10,6 @@ An AI-powered chatbot designed to assist international students at IMT Mines AlÃ
 [![License](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
 ---
-
----
-
 ## ðŸŽ¥ Demo Video
 
 
