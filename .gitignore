@@ -17,3 +17,17 @@ data/
 vector_db/
 cache/
 *.ipynb
+
+# PDF files and dataset folder
+*.pdf
+pdf_ingestion_dataset/
+
+# Generated KG visualization
+graph.html
+
+# Fuseki database volume
+fuseki-data/
+
+# Claude Code agent files
+.agents/
+skills-lock.json

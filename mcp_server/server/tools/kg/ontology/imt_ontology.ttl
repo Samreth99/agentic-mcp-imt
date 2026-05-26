@@ -1,0 +1,838 @@
+@prefix owl:   <http://www.w3.org/2002/07/owl#> .
+@prefix rdf:   <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
+@prefix skos:  <http://www.w3.org/2004/02/skos/core#> .
+@prefix imt:   <http://imt-mines-ales.fr/ontology#> .
+@prefix imtd:  <http://imt-mines-ales.fr/data#> .
+
+# ============================================================
+# ONTOLOGY METADATA
+# ============================================================
+
+<http://imt-mines-ales.fr/ontology>
+    a owl:Ontology ;
+    rdfs:label "IMT Mines Alès Academic Ontology"@en ,
+               "Ontologie Académique IMT Mines Alès"@fr ;
+    rdfs:comment "Formal OWL ontology for representing academic course information at IMT Mines Alès, covering all engineering programs (2IA, PRISM, GC, I2ER, ISERM, TC). Grounded in the Syllabus Formations Ingénieur document structure."@en ;
+    owl:versionInfo "1.0.0" .
+
+
+# ============================================================
+# CLASSES — Teaching Units
+# ============================================================
+
+imt:TeachingUnit a owl:Class ;
+    rdfs:label "Teaching Unit"@en , "Unité d'Enseignement"@fr ;
+    rdfs:comment "Abstract base class for any academic teaching unit at IMT Mines Alès."@en .
+
+imt:Module a owl:Class ;
+    rdfs:subClassOf imt:TeachingUnit ;
+    rdfs:label "Module"@en , "Module / UE"@fr ;
+    rdfs:comment "A top-level teaching unit (UE) that may contain multiple courses or sub-elements. Maps to both 'Module' (older 2IA guides) and the UE-level entry in the Syllabus Formations Ingénieur format."@en .
+
+imt:Course a owl:Class ;
+    rdfs:subClassOf imt:TeachingUnit ;
+    rdfs:label "Course"@en , "Matière / Élément Constitutif"@fr ;
+    rdfs:comment "A sub-unit within a Module. Maps to 'Matière' in older guides and 'Élément constitutif de l'UE' in the standard Syllabus format."@en .
+
+
+# ============================================================
+# CLASSES — Academic Structure
+# ============================================================
+
+imt:Program a owl:Class ;
+    rdfs:label "Program"@en , "Département / Formation"@fr ;
+    rdfs:comment "An engineering program at IMT Mines Alès (e.g., 2IA, PRISM, GC, I2ER, ISERM, TC)."@en .
+
+imt:Track a owl:Class ;
+    rdfs:label "Track"@en , "Option / Filière"@fr ;
+    rdfs:comment "A specialization track within a program (e.g., IASD, IL, IMG within 2IA; gitm, sym within PRISM)."@en .
+
+imt:Semester a owl:Class ;
+    rdfs:label "Semester"@en , "Semestre"@fr ;
+    rdfs:comment "An academic semester. IMT Mines Alès uses S5–S10 for engineering curriculum."@en .
+
+imt:CompetencyBlock a owl:Class ;
+    rdfs:label "Competency Block"@en , "Bloc de Compétences"@fr ;
+    rdfs:comment "A competency block (BC) grouping related competencies in the curricular alignment framework."@en .
+
+imt:Competency a owl:Class ;
+    rdfs:label "Competency"@en , "Compétence"@fr ;
+    rdfs:comment "An individual competency (C) defined within a competency block and addressed by teaching units."@en .
+
+
+# ============================================================
+# CLASSES — People
+# ============================================================
+
+imt:Person a owl:Class ;
+    rdfs:label "Person"@en , "Personne"@fr .
+
+imt:Professor a owl:Class ;
+    rdfs:subClassOf imt:Person ;
+    rdfs:label "Professor"@en , "Enseignant"@fr ;
+    rdfs:comment "A professor, lecturer, or teaching assistant at IMT Mines Alès."@en .
+
+imt:Laboratory a owl:Class ;
+    rdfs:label "Laboratory"@en , "Laboratoire"@fr ;
+    rdfs:comment "A research laboratory affiliated with IMT Mines Alès (e.g., LGI2P, LGEI)."@en .
+
+
+# ============================================================
+# CLASSES — Evaluation
+# ============================================================
+
+imt:Evaluation a owl:Class ;
+    rdfs:label "Evaluation"@en , "Évaluation"@fr ;
+    rdfs:comment "An assessment component for a teaching unit, with a type (exam, project, oral) and a coefficient."@en .
+
+
+# ============================================================
+# CLASSES — Documents (FAQ & General)
+# ============================================================
+
+imt:Document a owl:Class ;
+    rdfs:label "Document"@en ;
+    rdfs:comment "A general institutional document (brochure, guideline, regulation)."@en .
+
+imt:FAQ a owl:Class ;
+    rdfs:subClassOf imt:Document ;
+    rdfs:label "FAQ"@en ;
+    rdfs:comment "A Frequently Asked Questions document about school life, procedures, or contracts."@en .
+
+imt:FAQEntry a owl:Class ;
+    rdfs:label "FAQ Entry"@en ;
+    rdfs:comment "A single question–answer pair within a FAQ document."@en .
+
+
+# ============================================================
+# OBJECT PROPERTIES — Teaching Unit Relations
+# ============================================================
+
+imt:hasCourse a owl:ObjectProperty ;
+    rdfs:domain imt:Module ;
+    rdfs:range  imt:Course ;
+    rdfs:label  "hasCourse"@en ;
+    rdfs:comment "A Module contains one or more Courses (matières / éléments constitutifs)."@en .
+
+imt:hasEvaluation a owl:ObjectProperty ;
+    rdfs:domain imt:TeachingUnit ;
+    rdfs:range  imt:Evaluation ;
+    rdfs:label  "hasEvaluation"@en ;
+    rdfs:comment "A teaching unit is assessed by one or more evaluations."@en .
+
+imt:taughtBy a owl:ObjectProperty ;
+    rdfs:domain imt:TeachingUnit ;
+    rdfs:range  imt:Professor ;
+    rdfs:label  "taughtBy"@en ;
+    rdfs:comment "A teaching unit is taught by a professor."@en .
+
+imt:responsibleProfessor a owl:ObjectProperty ;
+    rdfs:subPropertyOf imt:taughtBy ;
+    rdfs:domain imt:TeachingUnit ;
+    rdfs:range  imt:Professor ;
+    rdfs:label  "responsibleProfessor"@en ;
+    rdfs:comment "The designated responsible professor (Responsable) of a teaching unit."@en .
+
+imt:partOfProgram a owl:ObjectProperty ;
+    rdfs:domain imt:TeachingUnit ;
+    rdfs:range  imt:Program ;
+    rdfs:label  "partOfProgram"@en ;
+    rdfs:comment "This teaching unit belongs to an academic program."@en .
+
+imt:partOfTrack a owl:ObjectProperty ;
+    rdfs:domain imt:TeachingUnit ;
+    rdfs:range  imt:Track ;
+    rdfs:label  "partOfTrack"@en ;
+    rdfs:comment "This teaching unit is specific to a specialization track."@en .
+
+imt:inSemester a owl:ObjectProperty ;
+    rdfs:domain imt:TeachingUnit ;
+    rdfs:range  imt:Semester ;
+    rdfs:label  "inSemester"@en ;
+    rdfs:comment "The semester in which this teaching unit is delivered."@en .
+
+imt:hasPrerequisite a owl:ObjectProperty ;
+    rdfs:domain imt:TeachingUnit ;
+    rdfs:range  imt:TeachingUnit ;
+    rdfs:label  "hasPrerequisite"@en ;
+    rdfs:comment "This teaching unit requires the linked unit as a prerequisite."@en .
+
+imt:addressesCompetency a owl:ObjectProperty ;
+    rdfs:domain imt:TeachingUnit ;
+    rdfs:range  imt:Competency ;
+    rdfs:label  "addressesCompetency"@en ;
+    rdfs:comment "The teaching unit contributes to this competency."@en .
+
+imt:partOfModule a owl:ObjectProperty ;
+    owl:inverseOf imt:hasCourse ;
+    rdfs:domain imt:Course ;
+    rdfs:range  imt:Module ;
+    rdfs:label  "partOfModule"@en ;
+    rdfs:comment "This course belongs to the linked module."@en .
+
+
+# ============================================================
+# OBJECT PROPERTIES — Program / Track / Competency Structure
+# ============================================================
+
+imt:trackBelongsToProgram a owl:ObjectProperty ;
+    rdfs:domain imt:Track ;
+    rdfs:range  imt:Program ;
+    rdfs:label  "trackBelongsToProgram"@en .
+
+imt:competencyInBlock a owl:ObjectProperty ;
+    rdfs:domain imt:Competency ;
+    rdfs:range  imt:CompetencyBlock ;
+    rdfs:label  "competencyInBlock"@en ;
+    rdfs:comment "This competency belongs to a competency block."@en .
+
+imt:blockBelongsToProgram a owl:ObjectProperty ;
+    rdfs:domain imt:CompetencyBlock ;
+    rdfs:range  imt:Program ;
+    rdfs:label  "blockBelongsToProgram"@en .
+
+
+# ============================================================
+# OBJECT PROPERTIES — People / Infrastructure
+# ============================================================
+
+imt:affiliatedTo a owl:ObjectProperty ;
+    rdfs:domain imt:Professor ;
+    rdfs:range  imt:Laboratory ;
+    rdfs:label  "affiliatedTo"@en ;
+    rdfs:comment "The professor is affiliated with this research laboratory."@en .
+
+
+# ============================================================
+# OBJECT PROPERTIES — FAQ
+# ============================================================
+
+imt:hasFAQEntry a owl:ObjectProperty ;
+    rdfs:domain imt:FAQ ;
+    rdfs:range  imt:FAQEntry ;
+    rdfs:label  "hasFAQEntry"@en .
+
+imt:aboutProgram a owl:ObjectProperty ;
+    rdfs:domain imt:FAQ ;
+    rdfs:range  imt:Program ;
+    rdfs:label  "aboutProgram"@en ;
+    rdfs:comment "This FAQ is related to a specific program."@en .
+
+
+# ============================================================
+# DATATYPE PROPERTIES — TeachingUnit (shared)
+# ============================================================
+
+imt:unitCode a owl:DatatypeProperty ;
+    rdfs:domain imt:TeachingUnit ;
+    rdfs:range  xsd:string ;
+    rdfs:label  "unitCode"@en ;
+    rdfs:comment "Official code of the teaching unit (e.g., 2IA-iasd-9.6, TC_5_1, GCBDbe_9_3)."@en .
+
+imt:unitName a owl:DatatypeProperty ;
+    rdfs:domain imt:TeachingUnit ;
+    rdfs:range  xsd:string ;
+    rdfs:label  "unitName"@en ;
+    rdfs:comment "Full name of the teaching unit (in French, as it appears in official documents)."@en .
+
+imt:unitNameEN a owl:DatatypeProperty ;
+    rdfs:domain imt:TeachingUnit ;
+    rdfs:range  xsd:string ;
+    rdfs:label  "unitNameEN"@en ;
+    rdfs:comment "English name of the teaching unit (if provided in the document)."@en .
+
+imt:ects a owl:DatatypeProperty ;
+    rdfs:domain imt:TeachingUnit ;
+    rdfs:range  xsd:integer ;
+    rdfs:label  "ects"@en ;
+    rdfs:comment "Number of ECTS credits awarded for this teaching unit."@en .
+
+imt:supervisedHours a owl:DatatypeProperty ;
+    rdfs:domain imt:TeachingUnit ;
+    rdfs:range  xsd:integer ;
+    rdfs:label  "supervisedHours"@en ;
+    rdfs:comment "Total supervised/contact hours (Volume d'heures d'enseignement encadré)."@en .
+
+imt:personalWorkHours a owl:DatatypeProperty ;
+    rdfs:domain imt:TeachingUnit ;
+    rdfs:range  xsd:integer ;
+    rdfs:label  "personalWorkHours"@en ;
+    rdfs:comment "Estimated personal study hours (Volume d'heures de travail personnel)."@en .
+
+imt:rationale a owl:DatatypeProperty ;
+    rdfs:domain imt:TeachingUnit ;
+    rdfs:range  xsd:string ;
+    rdfs:label  "rationale"@en ;
+    rdfs:comment "Why this teaching unit exists — context and motivation (Pourquoi cette UE ?)."@en .
+
+imt:objectives a owl:DatatypeProperty ;
+    rdfs:domain imt:TeachingUnit ;
+    rdfs:range  xsd:string ;
+    rdfs:label  "objectives"@en ;
+    rdfs:comment "Learning objectives / targeted skills (Objectifs pédagogiques / Acquis d'apprentissage visés)."@en .
+
+imt:summary a owl:DatatypeProperty ;
+    rdfs:domain imt:TeachingUnit ;
+    rdfs:range  xsd:string ;
+    rdfs:label  "summary"@en ;
+    rdfs:comment "Short description or summary of the teaching unit content."@en .
+
+imt:content a owl:DatatypeProperty ;
+    rdfs:domain imt:TeachingUnit ;
+    rdfs:range  xsd:string ;
+    rdfs:label  "content"@en ;
+    rdfs:comment "Detailed programme and content (Programme et contenu)."@en .
+
+imt:keywords a owl:DatatypeProperty ;
+    rdfs:domain imt:TeachingUnit ;
+    rdfs:range  xsd:string ;
+    rdfs:label  "keywords"@en ;
+    rdfs:comment "Keywords associated with the teaching unit (Mots-clés)."@en .
+
+imt:prerequisiteText a owl:DatatypeProperty ;
+    rdfs:domain imt:TeachingUnit ;
+    rdfs:range  xsd:string ;
+    rdfs:label  "prerequisiteText"@en ;
+    rdfs:comment "Free-text description of prerequisites, may include course codes in parentheses."@en .
+
+imt:pedagogicalMethod a owl:DatatypeProperty ;
+    rdfs:domain imt:TeachingUnit ;
+    rdfs:range  xsd:string ;
+    rdfs:label  "pedagogicalMethod"@en ;
+    rdfs:comment "Description of teaching methods and organisation (Méthode et organisation pédagogique)."@en .
+
+imt:lectureHours a owl:DatatypeProperty ;
+    rdfs:domain imt:TeachingUnit ;
+    rdfs:range  xsd:integer ;
+    rdfs:label  "lectureHours"@en ;
+    rdfs:comment "Hours of lecture (Cours magistraux / CM)."@en .
+
+imt:workshopHours a owl:DatatypeProperty ;
+    rdfs:domain imt:TeachingUnit ;
+    rdfs:range  xsd:integer ;
+    rdfs:label  "workshopHours"@en ;
+    rdfs:comment "Hours of seminars and directed work (TD — Travaux Dirigés)."@en .
+
+imt:labHours a owl:DatatypeProperty ;
+    rdfs:domain imt:TeachingUnit ;
+    rdfs:range  xsd:integer ;
+    rdfs:label  "labHours"@en ;
+    rdfs:comment "Hours of practical lab sessions (TP — Travaux Pratiques)."@en .
+
+imt:projectHours a owl:DatatypeProperty ;
+    rdfs:domain imt:TeachingUnit ;
+    rdfs:range  xsd:integer ;
+    rdfs:label  "projectHours"@en ;
+    rdfs:comment "Hours dedicated to project work."@en .
+
+imt:examHours a owl:DatatypeProperty ;
+    rdfs:domain imt:TeachingUnit ;
+    rdfs:range  xsd:integer ;
+    rdfs:label  "examHours"@en ;
+    rdfs:comment "Hours allocated to scheduled exams and assessments (Contrôles)."@en .
+
+
+# ============================================================
+# DATATYPE PROPERTIES — Course (sub-unit specific)
+# ============================================================
+
+imt:coefficientInModule a owl:DatatypeProperty ;
+    rdfs:domain imt:Course ;
+    rdfs:range  xsd:decimal ;
+    rdfs:label  "coefficientInModule"@en ;
+    rdfs:comment "Weight/coefficient of this course within its parent module."@en .
+
+
+# ============================================================
+# DATATYPE PROPERTIES — Evaluation
+# ============================================================
+
+imt:evaluationType a owl:DatatypeProperty ;
+    rdfs:domain imt:Evaluation ;
+    rdfs:range  xsd:string ;
+    rdfs:label  "evaluationType"@en ;
+    rdfs:comment "Type of evaluation. Known values: devoir_sur_table, projet, exposé_oral, TP_noté, contrôle_surprise, soutenance."@en .
+
+imt:evaluationCoefficient a owl:DatatypeProperty ;
+    rdfs:domain imt:Evaluation ;
+    rdfs:range  xsd:decimal ;
+    rdfs:label  "evaluationCoefficient"@en ;
+    rdfs:comment "Numerical weight of this evaluation component."@en .
+
+imt:administrationMode a owl:DatatypeProperty ;
+    rdfs:domain imt:Evaluation ;
+    rdfs:range  xsd:string ;
+    rdfs:label  "administrationMode"@en ;
+    rdfs:comment "How the evaluation is administered: individuelle or groupe."@en .
+
+imt:feedbackDelay a owl:DatatypeProperty ;
+    rdfs:domain imt:Evaluation ;
+    rdfs:range  xsd:string ;
+    rdfs:label  "feedbackDelay"@en ;
+    rdfs:comment "Time limit for returning graded work to students (e.g., '3 semaines')."@en .
+
+imt:indicatorsEvaluated a owl:DatatypeProperty ;
+    rdfs:domain imt:Evaluation ;
+    rdfs:range  xsd:string ;
+    rdfs:label  "indicatorsEvaluated"@en ;
+    rdfs:comment "Competency indicators evaluated by this assessment (e.g., '1, 2, 3')."@en .
+
+
+# ============================================================
+# DATATYPE PROPERTIES — Professor
+# ============================================================
+
+imt:personName a owl:DatatypeProperty ;
+    rdfs:domain imt:Person ;
+    rdfs:range  xsd:string ;
+    rdfs:label  "personName"@en ;
+    rdfs:comment "Full name of the person (LAST First format as in official documents)."@en .
+
+imt:email a owl:DatatypeProperty ;
+    rdfs:domain imt:Person ;
+    rdfs:range  xsd:string ;
+    rdfs:label  "email"@en .
+
+imt:phone a owl:DatatypeProperty ;
+    rdfs:domain imt:Person ;
+    rdfs:range  xsd:string ;
+    rdfs:label  "phone"@en .
+
+imt:expertise a owl:DatatypeProperty ;
+    rdfs:domain imt:Professor ;
+    rdfs:range  xsd:string ;
+    rdfs:label  "expertise"@en ;
+    rdfs:comment "Research and teaching expertise domain of the professor."@en .
+
+
+# ============================================================
+# DATATYPE PROPERTIES — Laboratory
+# ============================================================
+
+imt:labCode a owl:DatatypeProperty ;
+    rdfs:domain imt:Laboratory ;
+    rdfs:range  xsd:string ;
+    rdfs:label  "labCode"@en ;
+    rdfs:comment "Short code of the laboratory (e.g., LGI2P, LGEI, CHROME)."@en .
+
+imt:labName a owl:DatatypeProperty ;
+    rdfs:domain imt:Laboratory ;
+    rdfs:range  xsd:string ;
+    rdfs:label  "labName"@en ;
+    rdfs:comment "Full name of the laboratory."@en .
+
+
+# ============================================================
+# DATATYPE PROPERTIES — Program & Track
+# ============================================================
+
+imt:programCode a owl:DatatypeProperty ;
+    rdfs:domain imt:Program ;
+    rdfs:range  xsd:string ;
+    rdfs:label  "programCode"@en ;
+    rdfs:comment "Short code of the program (e.g., 2IA, PRISM, GC, I2ER, ISERM, TC)."@en .
+
+imt:programName a owl:DatatypeProperty ;
+    rdfs:domain imt:Program ;
+    rdfs:range  xsd:string ;
+    rdfs:label  "programName"@en ;
+    rdfs:comment "Full name of the engineering program."@en .
+
+imt:programNameEN a owl:DatatypeProperty ;
+    rdfs:domain imt:Program ;
+    rdfs:range  xsd:string ;
+    rdfs:label  "programNameEN"@en .
+
+imt:trackCode a owl:DatatypeProperty ;
+    rdfs:domain imt:Track ;
+    rdfs:range  xsd:string ;
+    rdfs:label  "trackCode"@en ;
+    rdfs:comment "Short code of the specialization track (e.g., iasd, il, img, gitm, sym, be, igo, ee, risk)."@en .
+
+imt:trackName a owl:DatatypeProperty ;
+    rdfs:domain imt:Track ;
+    rdfs:range  xsd:string ;
+    rdfs:label  "trackName"@en ;
+    rdfs:comment "Full name of the specialization track."@en .
+
+
+# ============================================================
+# DATATYPE PROPERTIES — Semester
+# ============================================================
+
+imt:semesterCode a owl:DatatypeProperty ;
+    rdfs:domain imt:Semester ;
+    rdfs:range  xsd:string ;
+    rdfs:label  "semesterCode"@en ;
+    rdfs:comment "Semester identifier (S5, S6, S8, S9, S10)."@en .
+
+imt:academicYear a owl:DatatypeProperty ;
+    rdfs:domain imt:Semester ;
+    rdfs:range  xsd:string ;
+    rdfs:label  "academicYear"@en ;
+    rdfs:comment "Academic year of the syllabus (e.g., 2024-2025)."@en .
+
+
+# ============================================================
+# DATATYPE PROPERTIES — CompetencyBlock & Competency
+# ============================================================
+
+imt:blockCode a owl:DatatypeProperty ;
+    rdfs:domain imt:CompetencyBlock ;
+    rdfs:range  xsd:string ;
+    rdfs:label  "blockCode"@en ;
+    rdfs:comment "Code of the competency block (e.g., BC1, FIG-BC01, FIG-BC08)."@en .
+
+imt:blockName a owl:DatatypeProperty ;
+    rdfs:domain imt:CompetencyBlock ;
+    rdfs:range  xsd:string ;
+    rdfs:label  "blockName"@en ;
+    rdfs:comment "Human-readable name of the competency block."@en .
+
+imt:competencyCode a owl:DatatypeProperty ;
+    rdfs:domain imt:Competency ;
+    rdfs:range  xsd:string ;
+    rdfs:label  "competencyCode"@en ;
+    rdfs:comment "Competency identifier within its block (e.g., C1, C2, C3)."@en .
+
+imt:competencyLevel a owl:DatatypeProperty ;
+    rdfs:domain imt:Competency ;
+    rdfs:range  xsd:string ;
+    rdfs:label  "competencyLevel"@en ;
+    rdfs:comment "How the competency is addressed. Values: non_adressee | mise_en_oeuvre | enseignee | evaluee | enseignee_et_evaluee."@en .
+
+
+# ============================================================
+# DATATYPE PROPERTIES — FAQ
+# ============================================================
+
+imt:question a owl:DatatypeProperty ;
+    rdfs:domain imt:FAQEntry ;
+    rdfs:range  xsd:string ;
+    rdfs:label  "question"@en .
+
+imt:answer a owl:DatatypeProperty ;
+    rdfs:domain imt:FAQEntry ;
+    rdfs:range  xsd:string ;
+    rdfs:label  "answer"@en .
+
+imt:faqTopic a owl:DatatypeProperty ;
+    rdfs:domain imt:FAQ ;
+    rdfs:range  xsd:string ;
+    rdfs:label  "faqTopic"@en ;
+    rdfs:comment "Topic area of the FAQ (e.g., school_life, housing, contracts, procedures)."@en .
+
+
+# ============================================================
+# INSTANCE DATA — Programs (seed data from known dataset structure)
+# ============================================================
+
+imtd:program_2IA a imt:Program ;
+    imt:programCode "2IA" ;
+    imt:programName "Informatique et Intelligence Artificielle" ;
+    imt:programNameEN "Computer Science and Artificial Intelligence" .
+
+imtd:program_PRISM a imt:Program ;
+    imt:programCode "PRISM" ;
+    imt:programName "Production, Robotique, Ingénierie des Systèmes et Maintenance" ;
+    imt:programNameEN "Production, Robotics, Systems Engineering and Maintenance" .
+
+imtd:program_GC a imt:Program ;
+    imt:programCode "GC" ;
+    imt:programName "Génie Civil et Bâtiment Durable" ;
+    imt:programNameEN "Civil Engineering and Sustainable Buildings" .
+
+imtd:program_I2ER a imt:Program ;
+    imt:programCode "I2ER" ;
+    imt:programName "Ingénierie de l'Environnement, Énergie et Risques" ;
+    imt:programNameEN "Environmental, Energy and Risk Engineering" .
+
+imtd:program_ISERM a imt:Program ;
+    imt:programCode "ISERM" ;
+    imt:programName "Ingénierie des Sites, Environnement et Ressources Minières" ;
+    imt:programNameEN "Site Engineering, Environment and Mining Resources" .
+
+imtd:program_TC a imt:Program ;
+    imt:programCode "TC" ;
+    imt:programName "Tronc Commun" ;
+    imt:programNameEN "Common Core Curriculum" .
+
+imtd:program_ECOMAP a imt:Program ;
+    imt:programCode "ECOMAP" ;
+    imt:programName "Eco-conception et Management des Procédés" .
+
+
+# ============================================================
+# INSTANCE DATA — Tracks
+# ============================================================
+
+imtd:track_iasd a imt:Track ;
+    imt:trackCode "iasd" ;
+    imt:trackName "Intelligence Artificielle et Science des Données" ;
+    imt:trackBelongsToProgram imtd:program_2IA .
+
+imtd:track_il a imt:Track ;
+    imt:trackCode "il" ;
+    imt:trackName "Ingénierie Logicielle" ;
+    imt:trackBelongsToProgram imtd:program_2IA .
+
+imtd:track_img a imt:Track ;
+    imt:trackCode "img" ;
+    imt:trackName "Imagerie et Perception Visuelle" ;
+    imt:trackBelongsToProgram imtd:program_2IA .
+
+imtd:track_con a imt:Track ;
+    imt:trackCode "con" ;
+    imt:trackName "Connaissance et Raisonnement" ;
+    imt:trackBelongsToProgram imtd:program_2IA .
+
+imtd:track_gitm a imt:Track ;
+    imt:trackCode "gitm" ;
+    imt:trackName "Gestion et Intégration des Technologies de Maintenance" ;
+    imt:trackBelongsToProgram imtd:program_PRISM .
+
+imtd:track_sym a imt:Track ;
+    imt:trackCode "sym" ;
+    imt:trackName "Systèmes Mécatroniques" ;
+    imt:trackBelongsToProgram imtd:program_PRISM .
+
+imtd:track_be a imt:Track ;
+    imt:trackCode "be" ;
+    imt:trackName "Bâtiment et Éco-conception" ;
+    imt:trackBelongsToProgram imtd:program_GC .
+
+imtd:track_igo a imt:Track ;
+    imt:trackCode "igo" ;
+    imt:trackName "Ingénierie des Grands Ouvrages" ;
+    imt:trackBelongsToProgram imtd:program_GC .
+
+imtd:track_ee a imt:Track ;
+    imt:trackCode "ee" ;
+    imt:trackName "Énergie et Environnement" ;
+    imt:trackBelongsToProgram imtd:program_I2ER .
+
+imtd:track_risk a imt:Track ;
+    imt:trackCode "risk" ;
+    imt:trackName "Maîtrise des Risques Industriels" ;
+    imt:trackBelongsToProgram imtd:program_I2ER .
+
+
+# ============================================================
+# INSTANCE DATA — Semesters (2024-2025 academic year)
+# ============================================================
+
+imtd:semester_S5 a imt:Semester ;
+    imt:semesterCode "S5" ;
+    imt:academicYear "2024-2025" .
+
+imtd:semester_S6 a imt:Semester ;
+    imt:semesterCode "S6" ;
+    imt:academicYear "2024-2025" .
+
+imtd:semester_S8 a imt:Semester ;
+    imt:semesterCode "S8" ;
+    imt:academicYear "2024-2025" .
+
+imtd:semester_S9 a imt:Semester ;
+    imt:semesterCode "S9" ;
+    imt:academicYear "2024-2025" .
+
+imtd:semester_S10 a imt:Semester ;
+    imt:semesterCode "S10" ;
+    imt:academicYear "2024-2025" .
+
+
+# ============================================================
+# INSTANCE DATA — Laboratories (known from 2IA course guides)
+# ============================================================
+
+imtd:lab_LGI2P a imt:Laboratory ;
+    imt:labCode "LGI2P" ;
+    imt:labName "Laboratoire de Génie Informatique et d'Ingénierie de Production" .
+
+imtd:lab_LGEI a imt:Laboratory ;
+    imt:labCode "LGEI" ;
+    imt:labName "Laboratoire de Génie de l'Environnement" .
+
+imtd:lab_CHROME a imt:Laboratory ;
+    imt:labCode "CHROME" ;
+    imt:labName "Chimie de la Ressource, Hydrosystèmes, Océan et Milieux Extrêmes" .
+
+
+# ============================================================
+# INSTANCE DATA — Seed Modules (from 2IA-iasd 9.6 guide, manually verified)
+# ============================================================
+
+imtd:module_2IA_iasd_9_6 a imt:Module ;
+    imt:unitCode       "2IA-iasd-9.6" ;
+    imt:unitName       "Apprentissages Profond et par Renforcement" ;
+    imt:unitNameEN     "Deep and Reinforcement Learnings" ;
+    imt:ects           4 ;
+    imt:supervisedHours 50 ;
+    imt:keywords       "Deep Learning, Reinforcement Learning, PyTorch, Réseaux de neurones artificiels" ;
+    imt:inSemester     imtd:semester_S9 ;
+    imt:partOfProgram  imtd:program_2IA ;
+    imt:partOfTrack    imtd:track_iasd .
+
+imtd:course_2IA_iasd_9_6_1 a imt:Course ;
+    imt:unitCode           "2IA-iasd-9.6.1" ;
+    imt:unitName           "Introduction Avancée aux Réseaux de Neurones Artificiels" ;
+    imt:unitNameEN         "Advanced Introduction to Artificial Neural Networks" ;
+    imt:ects               1 ;
+    imt:supervisedHours    14 ;
+    imt:personalWorkHours  16 ;
+    imt:lectureHours       4 ;
+    imt:workshopHours      4 ;
+    imt:projectHours       4 ;
+    imt:examHours          2 ;
+    imt:coefficientInModule "1"^^xsd:decimal ;
+    imt:keywords           "Réseaux de neurones, apprentissage profond" ;
+    imt:prerequisiteText   "Introduction à l'apprentissage automatique (2IA-8.3), Advanced Machine Learning (2IA-9.2)" ;
+    imt:objectives         "Savoir définir précisément un réseau de neurones artificiels. Connaître les grandes approches, et les perspectives et challenges associés au domaine." ;
+    imt:inSemester         imtd:semester_S9 ;
+    imt:partOfProgram      imtd:program_2IA ;
+    imt:partOfTrack        imtd:track_iasd ;
+    imt:partOfModule       imtd:module_2IA_iasd_9_6 .
+
+imtd:course_2IA_iasd_9_6_2 a imt:Course ;
+    imt:unitCode           "2IA-iasd-9.6.2" ;
+    imt:unitName           "L'Apprentissage Profond en Pratique" ;
+    imt:unitNameEN         "Deep Learning in Action" ;
+    imt:ects               2 ;
+    imt:supervisedHours    20 ;
+    imt:personalWorkHours  20 ;
+    imt:lectureHours       5 ;
+    imt:labHours           10 ;
+    imt:projectHours       4 ;
+    imt:examHours          1 ;
+    imt:coefficientInModule "2"^^xsd:decimal ;
+    imt:keywords           "Apprentissage Profond, PyTorch" ;
+    imt:prerequisiteText   "Introduction à l'apprentissage automatique (2IA-8.3), Advanced Machine Learning (2IA-9.2), Python" ;
+    imt:objectives         "Être capable de mettre en oeuvre l'apprentissage profond en pratique pour aborder des problématiques de l'Industrie." ;
+    imt:inSemester         imtd:semester_S9 ;
+    imt:partOfProgram      imtd:program_2IA ;
+    imt:partOfTrack        imtd:track_iasd ;
+    imt:partOfModule       imtd:module_2IA_iasd_9_6 .
+
+imtd:course_2IA_iasd_9_6_3 a imt:Course ;
+    imt:unitCode           "2IA-iasd-9.6.3" ;
+    imt:unitName           "Introduction à l'Apprentissage par Renforcement" ;
+    imt:unitNameEN         "Introduction to Reinforcement Learning" ;
+    imt:ects               1 ;
+    imt:supervisedHours    16 ;
+    imt:personalWorkHours  15 ;
+    imt:lectureHours       3 ;
+    imt:labHours           8 ;
+    imt:projectHours       4 ;
+    imt:examHours          1 ;
+    imt:coefficientInModule "1"^^xsd:decimal ;
+    imt:keywords           "Apprentissage par renforcement, Deep Learning" ;
+    imt:prerequisiteText   "Introduction à l'apprentissage automatique (2IA-8.3), Advanced Machine Learning (2IA-9.2), PyTorch" ;
+    imt:objectives         "Savoir définir l'apprentissage par renforcement et le situer en tant que paradigme important de l'apprentissage automatique." ;
+    imt:inSemester         imtd:semester_S9 ;
+    imt:partOfProgram      imtd:program_2IA ;
+    imt:partOfTrack        imtd:track_iasd ;
+    imt:partOfModule       imtd:module_2IA_iasd_9_6 .
+
+imtd:module_2IA_iasd_9_6 imt:hasCourse imtd:course_2IA_iasd_9_6_1 .
+imtd:module_2IA_iasd_9_6 imt:hasCourse imtd:course_2IA_iasd_9_6_2 .
+imtd:module_2IA_iasd_9_6 imt:hasCourse imtd:course_2IA_iasd_9_6_3 .
+
+
+# ============================================================
+# INSTANCE DATA — Professors (known from 2IA-iasd 9.6 guide)
+# ============================================================
+
+imtd:prof_harispe a imt:Professor ;
+    imt:personName "Sébastien HARISPE" ;
+    imt:email      "sebastien.harispe@mines-ales.fr" ;
+    imt:phone      "04 34 24 62 82" ;
+    imt:expertise  "Intelligence Artificielle, Représentation des connaissances, Apprentissage Automatique" ;
+    imt:affiliatedTo imtd:lab_LGI2P .
+
+imtd:prof_johannet a imt:Professor ;
+    imt:personName "Anne JOHANNET" ;
+    imt:email      "anne.johannet@mines-ales.fr" ;
+    imt:phone      "04 66 78 53 49" ;
+    imt:expertise  "Intelligence Artificielle, Apprentissage Automatique, Réseaux de Neurones Artificiels" ;
+    imt:affiliatedTo imtd:lab_LGEI .
+
+imtd:prof_guyot a imt:Professor ;
+    imt:personName "Patrice GUYOT" ;
+    imt:email      "patrice.guyot@mines-ales.fr" ;
+    imt:phone      "04 66 78 62 49" ;
+    imt:expertise  "Intelligence Artificielle, Traitement du Signal Son et Parole, Apprentissage Automatique" ;
+    imt:affiliatedTo imtd:lab_LGI2P .
+
+imtd:module_2IA_iasd_9_6 imt:responsibleProfessor imtd:prof_harispe .
+imtd:course_2IA_iasd_9_6_1 imt:responsibleProfessor imtd:prof_johannet .
+imtd:course_2IA_iasd_9_6_1 imt:taughtBy imtd:prof_johannet .
+imtd:course_2IA_iasd_9_6_2 imt:responsibleProfessor imtd:prof_harispe .
+imtd:course_2IA_iasd_9_6_2 imt:taughtBy imtd:prof_harispe .
+imtd:course_2IA_iasd_9_6_2 imt:taughtBy imtd:prof_guyot .
+imtd:course_2IA_iasd_9_6_3 imt:responsibleProfessor imtd:prof_harispe .
+imtd:course_2IA_iasd_9_6_3 imt:taughtBy imtd:prof_harispe .
+
+
+# ============================================================
+# INSTANCE DATA — Evaluations (2IA-iasd 9.6, manually verified)
+# ============================================================
+
+imtd:eval_9_6_1_exam a imt:Evaluation ;
+    imt:evaluationType        "devoir_sur_table" ;
+    imt:evaluationCoefficient "1.5"^^xsd:decimal ;
+    imt:administrationMode    "individuelle" ;
+    imt:indicatorsEvaluated   "1, 2, 3" .
+
+imtd:eval_9_6_1_project a imt:Evaluation ;
+    imt:evaluationType        "projet_TP" ;
+    imt:evaluationCoefficient "0.25"^^xsd:decimal ;
+    imt:administrationMode    "groupe" ;
+    imt:feedbackDelay         "3 semaines" .
+
+imtd:eval_9_6_1_oral a imt:Evaluation ;
+    imt:evaluationType        "expose_oral" ;
+    imt:evaluationCoefficient "0.25"^^xsd:decimal ;
+    imt:administrationMode    "groupe" .
+
+imtd:course_2IA_iasd_9_6_1 imt:hasEvaluation imtd:eval_9_6_1_exam .
+imtd:course_2IA_iasd_9_6_1 imt:hasEvaluation imtd:eval_9_6_1_project .
+imtd:course_2IA_iasd_9_6_1 imt:hasEvaluation imtd:eval_9_6_1_oral .
+
+imtd:eval_9_6_2_exam a imt:Evaluation ;
+    imt:evaluationType        "devoir_sur_table" ;
+    imt:evaluationCoefficient "0.25"^^xsd:decimal ;
+    imt:administrationMode    "individuelle" .
+
+imtd:eval_9_6_2_project a imt:Evaluation ;
+    imt:evaluationType        "projet" ;
+    imt:evaluationCoefficient "0.75"^^xsd:decimal ;
+    imt:administrationMode    "groupe" ;
+    imt:feedbackDelay         "3 semaines" .
+
+imtd:course_2IA_iasd_9_6_2 imt:hasEvaluation imtd:eval_9_6_2_exam .
+imtd:course_2IA_iasd_9_6_2 imt:hasEvaluation imtd:eval_9_6_2_project .
+
+imtd:eval_9_6_3_exam a imt:Evaluation ;
+    imt:evaluationType        "devoir_sur_table" ;
+    imt:evaluationCoefficient "0.25"^^xsd:decimal ;
+    imt:administrationMode    "individuelle" .
+
+imtd:eval_9_6_3_project a imt:Evaluation ;
+    imt:evaluationType        "projet" ;
+    imt:evaluationCoefficient "0.75"^^xsd:decimal ;
+    imt:administrationMode    "groupe" ;
+    imt:feedbackDelay         "3 semaines" .
+
+imtd:course_2IA_iasd_9_6_3 imt:hasEvaluation imtd:eval_9_6_3_exam .
+imtd:course_2IA_iasd_9_6_3 imt:hasEvaluation imtd:eval_9_6_3_project .
+
+
+# ============================================================
+# INSTANCE DATA — Prerequisite links (known from 9.6 guide)
+# ============================================================
+
+imtd:course_2IA_iasd_9_6_3 imt:hasPrerequisite imtd:course_2IA_iasd_9_6_1 .
+imtd:course_2IA_iasd_9_6_3 imt:hasPrerequisite imtd:course_2IA_iasd_9_6_2 .

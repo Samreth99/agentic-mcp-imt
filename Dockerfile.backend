@@ -11,7 +11,8 @@ RUN pip install --no-cache-dir \
     langgraph \
     fastmcp \
     langchain-groq \
-    python-dotenv 
+    langsmith \
+    python-dotenv
 
 EXPOSE 8000
 

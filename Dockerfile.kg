@@ -1,0 +1,17 @@
+FROM python:3.11-slim
+
+WORKDIR /app
+
+COPY mcp_server ./mcp_server
+
+RUN pip install --no-cache-dir \
+    fastmcp \
+    langchain-core \
+    langchain-groq \
+    pymupdf \
+    python-dotenv \
+    requests
+
+EXPOSE 3001
+
+CMD ["python", "-m", "mcp_server.server.tools.kg.kg_server"]

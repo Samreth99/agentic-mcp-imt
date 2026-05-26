@@ -1,25 +1,25 @@
-# IMT Mines Alès Chatbot - Agentic RAG with MCP
+# IMT Mines Alès Chatbot — Agentic RAG + Knowledge Graph with MCP
 
-An AI-powered chatbot designed to assist international students at IMT Mines Alès with academic information, administrative procedures, and campus services. This project implements the **Agentic Retrieval-Augmented Generation (RAG)** system using the **Model Context Protocol (MCP)** and **LangGraph**.
+An AI-powered chatbot designed to assist international students at IMT Mines Alès with academic information, administrative procedures, and campus services. This project implements an **Agentic RAG + Knowledge Graph** system using the **Model Context Protocol (MCP)**, **LangGraph**, and **Apache Jena Fuseki**.
 
-[![Python](https://img.shields.io/badge/Python-3.11+-blue.svg)](https://www.python.org/downloads/)
-[![React](https://img.shields.io/badge/React-19.2.0-61DAFB.svg?logo=react)](https://react.dev/)
+[![Python](https://img.shields.io/badge/Python-3.11+-blue.svg)](https://www.python.org/)
+[![React](https://img.shields.io/badge/React-19.2.0-61DAFB?logo=react)](https://reactjs.org/)
 [![FastMCP](https://img.shields.io/badge/FastMCP-2.12.3+-purple.svg)](https://github.com/jlowin/fastmcp)
 [![LangChain](https://img.shields.io/badge/LangChain-0.3.27+-orange.svg)](https://www.langchain.com/)
-[![LangGraph](https://img.shields.io/badge/LangGraph-0.6.7+-red.svg)](https://langchain-ai.github.io/langgraph/)
-[![License](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+[![LangGraph](https://img.shields.io/badge/LangGraph-0.6.7+-orange.svg)](https://langchain-ai.github.io/langgraph/)
+[![Fuseki](https://img.shields.io/badge/Apache%20Jena%20Fuseki-SPARQL-red.svg)](https://jena.apache.org/documentation/fuseki2/)
+[![LangSmith](https://img.shields.io/badge/LangSmith-Tracing-green.svg)](https://smith.langchain.com/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 ---
-## 🎥 Demo Video
 
-
+## Demo Video
 
 https://github.com/user-attachments/assets/5bc3b84b-d52a-4f63-94f9-d4db74552800
 
-
 ---
 
-## 📋 Table of Contents
+## Table of Contents
 
 - [Overview](#overview)
 - [Architecture](#architecture)
@@ -36,113 +36,120 @@ https://github.com/user-attachments/assets/5bc3b84b-d52a-4f63-94f9-d4db74552800
 
 ---
 
-## 🎯 Overview
+## Overview
 
 This chatbot provides 24/7 assistance to international students by answering questions about:
 
-- Course syllabi and academic requirements
-- Administrative procedures and documentation
-- Campus facilities and student services
-- General information about IMT Mines Alès
+- Course syllabi, ECTS credits, and academic requirements
+- Professor information and teaching assignments
+- Evaluation methods and coefficients
+- Administrative procedures and campus services
+- General information about IMT Mines Alès programs
 
-The system achieves **9.26/10** overall score (evaluated by GPT-4o as judge), demonstrating:
+The system combines two complementary knowledge retrieval strategies:
 
-- **8.91/10** Correctness
-- **9.12/10** Completeness
-- **10.00/10** Safety
+- **Vector RAG** — semantic search over full PDF text for open-ended contextual questions
+- **Knowledge Graph** — structured SPARQL queries over a Fuseki triplestore for precise factual lookups (ECTS, professors, evaluations, prerequisites, semesters)
 
 ---
 
-## 🏗️ Architecture
-
-The system consists of three main components:
+## Architecture
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
 │                     Frontend (React + TS)                    │
-│                     Port: 5173                               │
+│                        Port: 5173                            │
 └──────────────────────────┬──────────────────────────────────┘
                            │
                            ▼
 ┌─────────────────────────────────────────────────────────────┐
-│              Backend (FastAPI + LangGraph Agent)             │
-│                     Port: 8000                               │
-│  ┌────────────────────────────────────────────────────┐     │
-│  │   ReAct Agent (gpt-oss-20b via Groq)               │     │
-│  │   • Reasoning & Tool Orchestration                 │     │
-│  │   • Memory Persistence                             │     │
-│  └────────────┬───────────────────────────────────────┘     │
-└───────────────┼─────────────────────────────────────────────┘
-                │
-                ▼
-┌─────────────────────────────────────────────────────────────┐
-│              MCP Server (RAG Tools)                          │
-│                     Port: 3000                               │
-│  ┌────────────────────────────────────────────────────┐     │
-│  │   Tools:                                           │     │
-│  │   • ingest_documents (PDF/URL)                     │     │
-│  │   • retrieve_documents (Semantic Search)           │     │
-│  │   • get_vector_store_info                          │     │
-│  │   • clear_vector_store                             │     │
-│  └────────────┬───────────────────────────────────────┘     │
-└───────────────┼─────────────────────────────────────────────┘
-                │
-                ▼
-┌─────────────────────────────────────────────────────────────┐
-│         ChromaDB Vector Store + BGE-M3 Embeddings            │
-│         • Chunk Size: 1000 tokens                            │
-│         • Overlap: 200 tokens                                │
-│         • Top-K: 5 documents                                 │
-└─────────────────────────────────────────────────────────────┘
+│           Backend — FastAPI + LangGraph ReAct Agent          │
+│                        Port: 8000                            │
+│  ┌──────────────────────────────────────────────────────┐   │
+│  │  ReAct Agent (gpt-oss-20b via Groq)                  │   │
+│  │  • Autonomous tool selection (RAG vs KG)             │   │
+│  │  • Multi-step reasoning & tool orchestration         │   │
+│  │  • LangSmith tracing & observability                 │   │
+│  └────────┬──────────────────────────┬──────────────────┘   │
+└───────────┼──────────────────────────┼──────────────────────┘
+            │                          │
+            ▼                          ▼
+┌───────────────────────┐  ┌───────────────────────────────────┐
+│  RAG MCP Server       │  │  KG MCP Server                    │
+│  Port: 3000           │  │  Port: 3001                       │
+│                       │  │                                   │
+│  • retrieve_documents │  │  • query_knowledge_graph          │
+│  • ingest_documents   │  │    (NL → SPARQL → Fuseki)         │
+│  • get_vector_store_  │  │  • sparql_query (direct)          │
+│    info               │  │  • build_knowledge_graph          │
+│  • clear_vector_store │  │    (PDF → triples → Fuseki)       │
+└──────────┬────────────┘  │  • get_kg_statistics              │
+           │               └──────────────┬────────────────────┘
+           ▼                              ▼
+┌───────────────────────┐  ┌───────────────────────────────────┐
+│  ChromaDB             │  │  Apache Jena Fuseki               │
+│  BGE-M3 Embeddings    │  │  SPARQL 1.1 Triplestore           │
+│  • Chunk: 1000 tokens │  │  Port: 3030                       │
+│  • Overlap: 200       │  │  Dataset: /imt                    │
+│  • Top-K: 5 docs      │  │  IMT OWL Ontology                 │
+└───────────────────────┘  └───────────────────────────────────┘
 ```
 
 ### Key Design Decisions
 
-- **BGE-M3 Embeddings**: State-of-the-art multilingual embedding model for retrieval
-- **ReAct Pattern**: Enables reasoning and action interleaving for complex queries
-- **MCP Protocol**: Standardized interface for AI-to-tool communication
-- **Low-Latency Inference**: Groq API provides sub-second response times
-- **Stateful Agent**: LangGraph manages conversation history and context
+- **Hybrid retrieval**: RAG handles open-ended questions; KG handles structured fact lookups — the ReAct agent decides autonomously
+- **NL→SPARQL with self-correction**: LLM generates SPARQL, retries on failure with the error fed back as context
+- **Deduplication at ingestion**: Fuseki tracks processed PDFs to prevent re-ingestion and entity drift
+- **BGE-M3 Embeddings**: Multilingual embedding model for cross-language retrieval
+- **MCP Protocol**: Standardized interface allowing the agent to call both RAG and KG tools uniformly
+- **LangSmith tracing**: Full observability over every agent step, tool call, and LLM invocation
+
+### IMT Knowledge Graph Ontology
+
+The KG uses a formal OWL ontology (`mcp_server/server/tools/kg/ontology/imt_ontology.ttl`) with:
+
+**Classes**: `imt:Module`, `imt:Course`, `imt:Professor`, `imt:Evaluation`, `imt:Program`, `imt:Track`, `imt:Semester`, `imt:Laboratory`, `imt:FAQEntry`
+
+**Key properties**: `ects`, `supervisedHours`, `lectureHours`, `evaluationType`, `evaluationCoefficient`, `personName`, `semesterCode`, `taughtBy`, `responsibleProfessor`, `hasEvaluation`, `inSemester`, `partOfProgram`, `hasPrerequisite`
 
 ---
 
-## ✨ Features
+## Features
 
-- 🔍 **Semantic Search**: Retrieves relevant documents using dense vector embeddings
-- 🤖 **ReAct Agent**: Reasons through complex multi-step queries
-- 📚 **Document Management**: Ingest PDFs from local files, directories, or URLs
-- 🌐 **Multilingual Support**: BGE-M3 handles multiple languages
-- 💬 **Chat Interface**: Clean React-based UI with markdown rendering
-- 🔒 **Safety First**: Achieves perfect 10/10 safety score in evaluations
-- 📊 **Observable Reasoning**: Transparent agent thought process
+- **Semantic Search**: Dense vector retrieval over 138 IMT PDF course guides
+- **Knowledge Graph Queries**: Precise structured answers via NL→SPARQL pipeline
+- **ReAct Agent**: Autonomously selects the right tool for each question type
+- **PDF Ingestion**: LLM-based triple extraction from PDFs directly into Fuseki
+- **Deduplication**: Fuseki-tracked ingestion log prevents re-processing PDFs
+- **Multilingual**: BGE-M3 handles French and English course content
+- **Observable**: LangSmith traces every agent step for evaluation and debugging
+- **Chat Interface**: React UI with live tool status indicators
 
 ---
 
-## 📦 Prerequisites
+## Prerequisites
 
-Before you begin, ensure you have the following installed:
-
-- **Python 3.11+** (tested with Python 3.11)
+- **Python 3.11+**
 - **Node.js 18+** and **npm**
+- **Docker**
 - **Git**
 
 ### API Keys Required
 
-You'll need API keys for:
-
-- **Groq API**: For `gpt-oss-20b` model ([Get API key](https://console.groq.com/keys))
-- **OpenAI API** (optional): For LLM-as-a-Judge
-
-Create a `.env` file in the project root:
-
-```bash
-GROQ_API_KEY=your_groq_api_key_here
-# OPENAI_API_KEY=your_openai_api_key_here  # Optional
+```env
+GROQ_API_KEY=your_groq_api_key
+OPENAI_API_KEY=your_openai_api_key        # for LLM-as-a-Judge evaluation
+FUSEKI_URL=http://localhost:3030/imt
+FUSEKI_USER=your_fuseki_username
+FUSEKI_PASSWORD=your_fuseki_password
+LANGSMITH_TRACING=true
+LANGSMITH_API_KEY=your_langsmith_api_key
+LANGSMITH_PROJECT=agentic-mcp
 ```
 
 ---
 
-## 🚀 Installation
+## Installation
 
 ### 1. Clone the Repository
 
@@ -153,278 +160,222 @@ cd agentic-mcp-imt
 
 ### 2. Install UV Package Manager
 
-UV is a fast Python package installer and resolver. Install it following the [official documentation](https://docs.astral.sh/uv/getting-started/installation/):
-
-**Windows (PowerShell):**
-
 ```powershell
+# Windows
 powershell -c "irm https://astral.sh/uv/install.ps1 | iex"
 ```
 
-**macOS/Linux:**
-
 ```bash
+# macOS/Linux
 curl -LsSf https://astral.sh/uv/install.sh | sh
 ```
 
-### 3. Create Virtual Environment
+### 3. Install Dependencies
 
 ```bash
 uv venv .venv
-```
-
-### 4. Activate Virtual Environment
-
-**Windows:**
-
-```bash
-.venv\Scripts\activate
-```
-
-**macOS/Linux:**
-
-```bash
-source .venv/bin/activate
-```
-
-### 5. Install Project Dependencies
-
-```bash
 uv pip install .
 ```
 
-This will install all required dependencies including:
-
-- LangChain & LangGraph
-- FastAPI & Uvicorn
-- ChromaDB
-- Sentence Transformers
-- And more...
-
-### 6. Install Frontend Dependencies
+### 4. Install Frontend Dependencies
 
 ```bash
-cd frontend
-npm install
-cd ..
+cd frontend && npm install && cd ..
 ```
+
+### 5. Start Apache Jena Fuseki
+
+```bash
+docker run -d --name fuseki -p 3030:3030 \
+  -e ADMIN_PASSWORD=your_password \
+  -v ${PWD}/fuseki-data:/fuseki \
+  stain/jena-fuseki
+```
+
+Then open `http://localhost:3030`, log in as `admin/<your_password>`, and create a dataset named **`imt`** (Persistent TDB2).
 
 ---
 
-## 🏃 Running the Application
+## Running the Application
 
-The application requires **three separate terminal windows**, each running a different component.
-
-### Terminal 1: MCP Server (RAG Tools)
+### Local Development (4 terminals)
 
 ```bash
-# Make sure virtual environment is activated
+# Terminal 1 — RAG MCP Server (port 3000)
 uv run -m mcp_server.server.tools.rag.rag_server
-```
 
-**Expected output:**
+# Terminal 2 — KG MCP Server (port 3001)
+uv run -m mcp_server.server.tools.kg.kg_server
 
-```
-MCP Server running on http://localhost:3000
-Vector store initialized with ChromaDB
-```
-
-### Terminal 2: Agent Backend Server
-
-```bash
-# Make sure virtual environment is activated
+# Terminal 3 — Agent Backend (port 8000)
 uv run -m agent.main
+
+# Terminal 4 — Frontend (port 5173)
+cd frontend && npm run dev
 ```
 
-**Expected output:**
+### Build the Knowledge Graph (one-time)
 
-```
-INFO:     Uvicorn running on http://127.0.0.1:8000
-INFO:     Application startup complete.
-```
+Ask the chatbot:
 
-### Terminal 3: Frontend Development Server
+> _"Build the knowledge graph from `<path-to-pdf-ingestion-dataset>`"_
+
+Or run directly:
 
 ```bash
-cd frontend
-npm run dev
+uv run python -c "
+from mcp_server.server.tools.kg.triple_extractor import process_directory, make_llm
+result = process_directory('pdf_ingestion_dataset', make_llm())
+print(result)
+"
 ```
 
-**Expected output:**
+### Docker Deployment
 
-```
-VITE v5.x.x  ready in xxx ms
-
-➜  Local:   http://localhost:5173/
-➜  Network: use --host to expose
+```bash
+docker compose up --build
 ```
 
-### Accessing the Application
-
-Open your browser and navigate to:
-
-```
-http://localhost:5173
-```
-
-You should see the chat interface ready to accept queries!
+Services started: `fuseki` (3030) → `rag_server` (3000) + `kg_server` (3001) → `api_server` (8000).
 
 ---
 
-## 📂 Project Structure
+## Project Structure
 
 ```
 agentic-mcp-imt/
-├── agent/                         # Backend agent implementation
-│   ├── main.py                    # FastAPI application entry point
-│   ├── agent_client.py            # Agent client for testing
-│   ├── api/                       # FastAPI routes and services
-│   ├── config/                    # Configuration files
-│   │   └── prompts.py             # System prompts and templates
-│   ├── evaluation/                # Evaluation
-│   │   └── data_set.py            # Testset
-│   │   └── llm_as_a_judge.py      # LLM-as-a-Judge Evalulation
-│   ├── graph/                     # LangGraph implementation
-│   │   └── graph_builder.py       # LangGraph ReAct agent logic
-│   ├── schemas/                   # Pydantic schemas
-│   └── utils/                     # Utility functions
+├── agent/
+│   ├── main.py                        # FastAPI entry point
+│   ├── agent_client.py                # MCP client + LangGraph agent init
+│   ├── api/                           # Routes and services
+│   ├── config/
+│   │   └── prompts.py                 # System prompt (RAG + KG tool guidance)
+│   ├── evaluation/
+│   │   ├── data_set.py                # 33-question evaluation dataset
+│   │   └── llm_as_a_judge.py          # GPT-4o judge evaluation runner
+│   └── graph/
+│       └── graph_builder.py           # LangGraph ReAct agent
 │
-├── mcp_server/                    # MCP server implementation
-│   └── server/
-│       └── tools/
-│           └── rag/
-│               ├── rag_server.py  # MCP RAG tool server
-│               └── ingestion/     # Data ingestion pipeline
-│                   └── vector_store.py # ChromaDB interface
+├── mcp_server/
+│   ├── config/
+│   │   ├── kg_constants.py            # Fuseki URL, credentials, LLM config
+│   │   └── setting.py
+│   └── server/tools/
+│       ├── rag/
+│       │   ├── rag_server.py          # RAG MCP server (port 3000)
+│       │   └── ingestion/             # ChromaDB + BGE-M3 pipeline
+│       └── kg/
+│           ├── kg_server.py           # KG MCP server (port 3001)
+│           ├── triple_extractor.py    # PDF → SPARQL INSERT → Fuseki
+│           ├── sparql_executor.py     # NL → SPARQL → Fuseki → rows
+│           └── ontology/
+│               └── imt_ontology.ttl   # OWL ontology for IMT domain
 │
-├── frontend/                      # React TypeScript frontend
-│   ├── src/
-│   │   ├── components/           # React components
-│   │   ├── api/                  # API services
-│   │   └── App.tsx               # Main application
-│   ├── package.json
-│   └── vite.config.ts
-│
-├── evaluation_results.json        # Evaluation metrics
-├── pyproject.toml                 # Python project configuration
-├── docker-compose.yaml            # Docker orchestration
-├── Dockerfile.backend             # Dockerfile for the backend
-├── Dockerfile.mcp                 # Dockerfile for the MCP server
-├── uv.lock                        # UV lock file
-└── README.md                      # This file
+├── frontend/                          # React + TypeScript UI
+├── docker-compose.yaml                # Fuseki + RAG + KG + API services
+├── Dockerfile.backend                 # Agent backend image
+├── Dockerfile.mcp                     # RAG server image
+├── Dockerfile.kg                      # KG server image
+├── pyproject.toml
+└── README.md
 ```
 
+---
 
-
-## 🛠️ Technologies Used
+## Technologies Used
 
 ### Backend
 
-- **LangChain & LangGraph**: Agent orchestration and reasoning
-- **FastAPI**: High-performance async web framework
-- **ChromaDB**: Vector database for embeddings
-- **BGE-M3**: Multilingual embedding model
-- **Groq API**: Ultra-low latency LLM inference
-- **Model Context Protocol (MCP)**: Standardized tool interface
+- **LangChain & LangGraph** — agent orchestration and ReAct reasoning
+- **FastAPI** — async REST API
+- **ChromaDB** — vector database
+- **BGE-M3** — multilingual embedding model
+- **Groq API** — low-latency LLM inference (`gpt-oss-20b`)
+- **Apache Jena Fuseki** — SPARQL 1.1 RDF triplestore
+- **FastMCP** — MCP server framework
+- **LangSmith** — agent tracing and observability
 
 ### Frontend
 
-- **React 18**: UI framework
-- **TypeScript**: Type-safe development
-- **Vite**: Fast build tool
-- **TailwindCSS**: Utility-first styling
+- **React 18 + TypeScript**
+- **Vite**
+- **TailwindCSS**
 
 ### Infrastructure
 
-- **UV**: Fast Python package management
-- **Docker & Docker Compose**: Containerization
-- **Uvicorn**: ASGI server
+- **Docker & Docker Compose**
+- **UV** — Python package management
 
 ---
 
-## 📊 Evaluation Results
+## Evaluation Results
 
-Evaluated using **GPT-4o as a judge** on 33 test questions:
+Evaluated using **GPT-4o as a judge** on 33 test questions covering course content, administrative procedures, and student services.
 
-| Metric            | Agentic RAG MCP | Fine-Tuning Baseline |
-| ----------------- | --------------- | -------------------- |
-| **Correctness**   | 8.91/10 ⭐      | 5.32/10              |
-| **Completeness**  | 9.12/10 ⭐      | 4.85/10              |
-| **Safety**        | 10.00/10 ⭐     | 9.35/10              |
-| **Overall Score** | **9.26/10** ⭐  | 6.17/10              |
+| Metric            | Agentic RAG + KG | Fine-Tuning Baseline |
+| ----------------- | ---------------- | -------------------- |
+| **Correctness**   | 8.30/10          | 5.32/10              |
+| **Completeness**  | 8.61/10          | 4.85/10              |
+| **Safety**        | 9.97/10          | 9.35/10              |
+| **Overall Score** | **8.83/10**      | 6.17/10              |
 
 ### Key Findings
 
-- ✅ **Grounded Responses**: RAG retrieval ensures factual accuracy
-- ✅ **Comprehensive Answers**: Multi-document synthesis provides complete information
-- ✅ **Perfect Safety**: Strong adherence to ethical guidelines
-- ✅ **Scalable Architecture**: Easy to update knowledge base without retraining
+- **+2.66 points overall** vs fine-tuning — retrieval-augmented generation significantly outperforms a fine-tuned model on this domain
+- **Grounded responses**: RAG + KG retrieval prevents hallucination of course facts
+- **Structured precision**: Knowledge Graph enables exact answers to structured queries (ECTS, professors, evaluations) that RAG alone cannot reliably produce
+- **Near-perfect safety**: Strong ethical guardrails maintained across all question types
+- **No retraining needed**: Knowledge base updates (new PDFs) require only re-ingestion, not model retraining
 
 ---
 
-## 🔮 Future Work
+## Future Work
 
-### Production Infrastructure
+### Layer 1 — Knowledge Graph Construction
 
-- [ ] PostgreSQL for user management
-- [ ] MongoDB for conversation history
-- [ ] OAuth 2.0 authentication
-- [ ] CI/CD pipeline with GitHub Actions
-- [ ] Kubernetes deployment
-- [ ] Monitoring and alerting
+- [ ] **Automatic ontology generation** — derive the domain ontology directly from the PDF corpus using an LLM, eliminating the need to author `imt_ontology.ttl` by hand; the inferred ontology adapts automatically as the document set grows
 
-### Model Improvements
+### Layer 2 — Decision Validation
 
-- [ ] **Hybrid Retrieval**: Combine BM25 sparse + dense embeddings
-- [ ] **Reranking**: Cross-encoder for precision improvement
-- [ ] **Adaptive-RAG**: Query complexity-aware retrieval
-- [ ] **Self-RAG**: Self-reflective generation
-- [ ] **RLHF**: Collect user feedback for continuous improvement
+- [ ] **Harness layer around KG generation** — because each LLM call is stochastic, individual triple-extraction runs can produce inconsistent or contradictory triples; a validation harness would:
+  - Intercept every proposed action (triple insertion, SPARQL write) before it reaches Fuseki
+  - Validate the proposed triples against the ontology rules (domain/range constraints, cardinality, required properties)
+  - Approve or reject each action before execution
+  - Log every decision with a structured explanation (rule violated, confidence score, corrective suggestion)
 
-### Feature Extensions
+### Layer 3 — Extended Evaluation
 
-- [ ] Schedule management MCP server
-- [ ] Administrative procedures MCP server
-- [ ] Event calendar integration
-- [ ] Multilingual UI support
-- [ ] Export conversation history
+- [ ] **Richer LLM-as-a-Judge metrics** — extend the existing GPT-4o judge framework beyond Correctness / Completeness / Safety with:
+  - `sparql_validity` — rate of syntactically and semantically valid SPARQL generated
+  - `tool_selection` — accuracy of the agent's choice between RAG and KG tools per question type
+  - `hop_accuracy` — correctness of multi-hop reasoning chains across KG relations (e.g., course → professor → laboratory)
 
 ---
 
-## 🤝 Contributing
-
-Contributions are welcome! Please feel free to submit a Pull Request.
+## Contributing
 
 1. Fork the repository
 2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
-3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
-4. Push to the branch (`git push origin feature/AmazingFeature`)
+3. Commit your changes
+4. Push to the branch
 5. Open a Pull Request
 
 ---
 
-## 📄 License
+## License
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+This project is licensed under the MIT License — see the [LICENSE](LICENSE) file for details.
 
 ---
 
-### Related Technologies
+## Resources
 
 - [Model Context Protocol (MCP)](https://modelcontextprotocol.io/docs/getting-started/intro)
 - [LangGraph Documentation](https://docs.langchain.com/oss/python/langgraph/overview)
-- [Groq API](https://groq.com/)
-- [ReAct Paper](https://arxiv.org/abs/2210.03629)
+- [Apache Jena Fuseki](https://jena.apache.org/documentation/fuseki2/)
 - [BGE-M3 Paper](https://arxiv.org/abs/2402.03216)
-
----
-
-## 🙏 Acknowledgments
-
-- IMT Mines Alès for providing the institutional knowledge base
-- Anthropic for the Model Context Protocol specification
-- LangChain team for the excellent agent framework
-- Groq for providing ultra-fast LLM inference
+- [Groq API](https://groq.com/)
+- [LangSmith](https://smith.langchain.com/)
 
 ---
 

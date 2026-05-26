@@ -1,5 +1,7 @@
 
+import os
 import traceback
+from datetime import timedelta
 from typing import Any, Optional
 from agent.graph.graph_builder import build_graph
 from langchain_mcp_adapters.client import MultiServerMCPClient
@@ -9,6 +11,9 @@ from langchain_core.messages import AnyMessage
 from agent.config.prompts import AGENT_SYSTEM_PROMPT
 from agent.config.constants import MODEL_NAME, TEMPERATURE
 from langchain_core.runnables import RunnableConfig
+
+RAG_SERVER_URL = os.getenv("RAG_SERVER_URL", "http://localhost:3000/mcp")
+KG_SERVER_URL  = os.getenv("KG_SERVER_URL",  "http://localhost:3001/mcp")
 
 class Agent_Client:
     def __init__(self) -> None:
@@ -24,10 +29,17 @@ class Agent_Client:
             self.client = MultiServerMCPClient(
                {
                     "rag_server": {
-                        "url": "http://localhost:3000/mcp",
-                        "transport": "streamable_http"
+                        "url": RAG_SERVER_URL,
+                        "transport": "streamable_http",
+                        "timeout": timedelta(seconds=120),
+                        "sse_read_timeout": timedelta(seconds=600),
                     },
-                    
+                    "kg_server": {
+                        "url": KG_SERVER_URL,
+                        "transport": "streamable_http",
+                        "timeout": timedelta(seconds=120),
+                        "sse_read_timeout": timedelta(seconds=600),
+                    },
                     # "tavily-remote": {
                     #     "url": "https://mcp.tavily.com/mcp/?tavilyApiKey=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",
                     #     "transport": "streamable_http",
@@ -52,7 +64,10 @@ class Agent_Client:
 
             state: State = {"messages": messages}
 
-            config: RunnableConfig = {"configurable": {"thread_id": thread_id}}
+            config: RunnableConfig = {
+                "configurable": {"thread_id": thread_id},
+                "recursion_limit": 50,
+            }
             result = await self.agent.ainvoke(state, config=config)
       
 
