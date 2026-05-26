@@ -350,18 +350,6 @@ Evaluated using **GPT-4o as a judge** on 33 test questions covering course conte
   - `tool_selection` — accuracy of the agent's choice between RAG and KG tools per question type
   - `hop_accuracy` — correctness of multi-hop reasoning chains across KG relations (e.g., course → professor → laboratory)
 
----
-
-## Contributing
-
-1. Fork the repository
-2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
-3. Commit your changes
-4. Push to the branch
-5. Open a Pull Request
-
----
-
 ## License
 
 This project is licensed under the MIT License — see the [LICENSE](LICENSE) file for details.
